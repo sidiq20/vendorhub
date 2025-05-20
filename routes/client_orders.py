@@ -31,3 +31,13 @@ def checkout():
     if not cart_id:
         flash("Your cart is empty.", "warning")
         return redirect(url_for("marketplace.home"))
+    
+    cart = db.carts.find_one({'cart_id': cart_id})
+    if not cart or not cart.get('items'):
+        flash("Your cart is empty", "warning")
+        return redirect(url_for('marketplace.home'))
+    
+    cart_items = []
+    total = 0
+    
+    for item in cart.get('items', [])

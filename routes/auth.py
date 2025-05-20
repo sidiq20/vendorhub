@@ -3,6 +3,7 @@ from firebase_admin import auth
 from bson.objectid import ObjectId
 from datetime import datetime
 import re
+import os
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -39,7 +40,7 @@ def login():
                 session['frebase_uid'] = firebase_uid
 
                 db.users.update_one(
-                    {'_id': ObjectId(db_users['_id'])},
+                    {'_id': ObjectId(db_user['_id'])},
                     {'$set': {'last_login': datetime.now()}}
                 )
 
@@ -80,13 +81,13 @@ def login():
 # Function to get Firebase config for templates
 def firebase_config():
     return {
-        'FIREBASE_API_KEY': 'AIzaSyD8UjMKoaOMNgaJx4sKn_VOAezdU_eNc2w',
-        'FIREBASE_AUTH_DOMAIN': 'vendorhub-b14ad.firebaseapp.com',
-        'FIREBASE_PROJECT_ID': 'vendorhub-b14ad',
-        'FIREBASE_STORAGE_BUCKET': 'vendorhub-b14ad.firebasestorage.app',
-        'FIREBASE_MESSAGING_SENDER_ID': '887510978000',
-        'FIREBASE_APP_ID': '1:887510978000:web:bd9793a6e37471951dbdd5',
-        'FIREBASE_MEASUREMENT_ID': 'G-4WQC5MJMHF'
+        'FIREBASE_API_KEY': os.environ.get('FIREBASE_API_KEY'),
+        'FIREBASE_AUTH_DOMAIN': os.environ.get('FIREBASE_AUTH_DOMAIN'),
+        'FIREBASE_PROJECT_ID': os.environ.get('FIREBASE_PROJECT_ID'),
+        'FIREBASE_STORAGE_BUCKET': os.environ.get('FIREBASE_STORAGE_BUCKET'),
+        'FIREBASE_MESSAGING_SENDER_ID': os.environ.get('FIREBASE_MESSAGING_SENDER_ID'),
+        'FIREBASE_APP_ID': os.environ.get('FIREBASE_APP_ID'),
+        'FIREBASE_MEASUREMENT_ID': os.environ.get('FIREBASE_MEASUREMENT_ID')
     }
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -98,9 +99,9 @@ def register():
         store_name = request.form.get("store_name")
         id_token = request.form.get("id_token") # get firebase token id here 
 
-        if not email or not password or not phone or not store:
+        if not email or not password or not phone or not store_name:
             flash("All fields are required", "danger")
-            return render_template("auth/register.html", config=firebase-config())
+            return render_template("auth/register.html", config=firebase_config())
 
         try:
             if id_token:
@@ -159,6 +160,6 @@ def register():
 
 @auth_bp.route('/logout')
 def logout():
-    sessions.clear()
+    session.clear()
     flash("You have been logged out", "info")
     return redirect(url_for("auth.login"))

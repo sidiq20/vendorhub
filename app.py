@@ -7,11 +7,14 @@ import firebase_admin
 from firebase_admin import credentials
 from werkzeug.utils import secure_filename
 import uuid
+from dotenv import load_dotenv
 
 from routes.auth import auth_bp
 from routes.cart import cart_bp
 from routes.dashboard import dashboard_bp
 from routes.marketplace import marketplace_bp
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -21,7 +24,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 
 # configure
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://sidiqolasode:6BLuUbubaw3PCp5X@vendorapp.a0phodn.mongodb.net/?retryWrites=true&w=majority&appName=vendorapp&tls=true&tlsAllowInvalidCertificates=true')
+MONGO_URI = os.environ.get('MONGO_URI')
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload size
