@@ -85,7 +85,7 @@
 
       <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
         <a
-          href="{{ url_for(dashboard.index) }} if session.get('user_id') else url_for('auth.login') }}"
+          href="{{ url_for('dashboard.index') }} if session.get('user_id') else url_for('auth.login') }}"
           class="btn-neu bg-primary-500 hover:bg-primary-600 text-white font-semibold px-8 py-4 rounded-xl transition-colors duration-300 hover-glow transition-shadow duration-300"
         >
           <i class="fas fa-home mr-2"></i>

@@ -1,0 +1,139 @@
+import os 
+import logging
+from datetime import datetime
+from flask import Flask, render_template, redirect, url_for, flash, session, send_from_directory, request
+from pymongo import response, server, mongo_client, MongoClient
+import firebase_admin
+from firebase_admin import credentials
+from werkzeug.utils import secure_filename
+import uuid
+
+from routes.auth import auth_bp
+from routes.cart import cart_bp
+from routes.dashboard import dashboard_bp
+from routes.marketplace import marketplace_bp
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
+
+# initalize app 
+app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
+
+# configure
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://sidiqolasode:6BLuUbubaw3PCp5X@vendorapp.a0phodn.mongodb.net/?retryWrites=true&w=majority&appName=vendorapp&tls=true&tlsAllowInvalidCertificates=true')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload size
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
+
+# Create uploads directory if it doesnt exist
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+# Initalize Firebase Admin SDK
+try:
+    # First try using enviroment varibale
+    if os.environ.get("FIREBASE_SERVICE_ACCOUNT"):
+        cred = credentials.Certificate(os.environ.get('FIREBASE_SERVICE_ACCOUNT'))
+        firebase_admin.initialize_app(cred)
+        logger.info("firebase initailzed with service account from evvironemt variable")
+    # Fall back to file-based config
+    elif os.path.exists("firebase-service-account.json"):
+        try:
+            cred = credentials.Certificate("firebase-service-account.json")
+            firebase_admin.initialize_app(cred)
+            logger.info("Firebase initailzed account with service account from file")
+        except Exception as file_error:
+            logger.error(f"Firebase service account file error: {file_error}")
+            # initialze without credentails 
+            firebase_admin.initialize_app()
+            logger.info("Firebase initalized without credentials (limited fucntionality)")
+    # try applications credentials
+    else:
+        firebase_admin.initialize_app()
+        logger.info("Firebase initalized with application default credentials")
+
+except Exception as e:
+    logger.error(f"Firebase initailzed error: {e}")
+    logger.warning("Using Firebase web SDK for authentication only.")
+
+# MongoDB Connection
+try:
+    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    # Set a specific database name instead of trying to extract it from the URI
+    db_name = 'vendorapp'
+    db = mongo_client[db_name]
+    # Ping the server to check if it's available
+    mongo_client.admin.command('ping')
+    logger.info(f"Connected to MongoDB successfully ({db_name})")
+except Exception as e:
+    logger.error(f"MongoDB connection error: {e}")
+    logger.error("Cannot continue without MongoDB connection")
+    raise
+
+# initailze routes with databse connection
+from routes import auth
+from routes import cart
+from routes import dashboard
+from routes import marketplace
+
+
+auth.init_db(db)
+dashboard.init_db(db)
+cart.init_db(db)
+marketplace.init_db(db)
+
+
+# Register blueprints
+app.register_blueprint(auth_bp)
+app.register_blueprint(cart_bp)
+app.register_blueprint(dashboard_bp)
+
+
+@app.after_request
+def log_request_info(response):
+    logger.info(f"Request: {request.method} {request.path} => Status: {response.status_code}")
+    return response
+
+# Hleper function for temp
+@app.template_filter("format_currency")
+def format_currency(amount):
+    return f"${amount:.2f}" if amount else "$0.00"
+
+@app.template_filter("format_datetime")
+def format_datetime(date):
+    if not date:
+        return ""
+    return date.strftime("%b %d, %Y %I:%M %p")
+
+@app.template_filter("format_date")
+def format_date(date):
+    if not date:
+        return ""
+    return date.strftime("%Y-%m-%d")
+
+# File serving route
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+# Root route
+@app.route("/")
+def index():
+    if "user_id" in session:
+        return redirect(url_for("dashboard.index"))
+    return redirect(url_for("marketplace.home"))
+
+# Error handlers
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
