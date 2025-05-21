@@ -21,7 +21,7 @@ def index():
     return render_template("customers/index.html", customers=customer)
 
 @customers_bp.route("/customers/add", methods=["GET", "POST"])
-login_required
+@login_required
 def add():
     if request.method == "POST":
         user_id = session.get("user_id")
