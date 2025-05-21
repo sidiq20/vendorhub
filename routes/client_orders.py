@@ -104,7 +104,137 @@ def checkout():
         for store_id, store_data in stores.items():
             order_id = str(uuid.uuid4())
             
-            # create order
             db.client_orders.insert_one({
-                
+                'order_id': order_id,
+                'user_id': session.get('user_id'),
+                'store_id': store_id,
+                'store_name': store_data['store'].get('name', 'UnknownStore'),
+                'customer': {
+                    'name': name,
+                    'email': email,
+                    'phone': phone,
+                    'address': address,
+                    'city': city,
+                    'state': state,
+                    'zip_code': zip_code,
+                },
+                'items': store_data['items'],
+                'total': store_data['total'],
+                'status': 'pending',
+                'status_text': 'Pending',
+                'status_history': [
+                    {'status': 'pending', 'date': datetime.now(),
+                     'note': 'Order placed'}
+                ],
+                'created_at': datetime.now(),
+                'updated_at': datetime.now(),    
             })
+            
+            order_ids.append(order_id)
+            
+            
+            db.carts.update_one(
+                {'cart_id': cart_id},
+                {
+                    '$set': {
+                        'items': [],
+                        'updated_at': datetime.now()
+                    }
+                }
+            )
+            
+            session.pop['recent_orders'] = order_ids
+            
+            return redirect(
+                url_for('client_orders.confirmation')
+            )
+            
+    return render_template(
+        'orders/checkout.html',
+        cart_items=cart_items,
+        total=total,
+        now=datetime.now(),
+    )
+    
+@client_orders_bp.route("/orders/confirmation")
+def confirmation():
+    order_ids = session.get('recent_orders', [])
+    if not order_ids:
+        flash("No recent orders found", "warning")
+        return redirect(url_for('marketplace.home'))
+    
+    orders = list(db.client_orders.find({'order_id': {'$in': order_ids}}))
+    
+    session.pop('recent_orders', None)
+    
+    return render_template(
+        'orders/confirmation.html',
+        orders=orders,
+        now=datetime.now(),
+    )
+    
+@client_orders_bp.route("/orders")
+def orders_history():
+    if session.get('user_id'):
+        orders = list(db.client_orders.find(
+            {'user_id': session.get('user_id')},
+        ).sort('created_at', -1))
+        
+    elif session.get('email'):
+        orders = list(db.client_orders.find(
+            {'customer.email': session.get('email')},
+        ).sort('created_at', -1))
+    else:
+        flash("Please login to view your orders", "info")
+        return redirect(url_for('auth.login'))
+    
+    return render_template(
+        'orders/orders.html',
+        orders=orders,
+        now=datetime.now(),
+    )
+    
+@client_orders_bp.route("/orders/<order_id>")
+def order_details(order_id):
+    order = db.client_orders.find_one({'order_id': order_id})
+    if not order:
+        flash("order not found", "danger")
+        return redirect(url_for('client_orders.orders_history'))
+    
+    if order.get('user_id') and order['user_id'] != session.get('user_id'):
+        if order.get('customer', {}).get('email') != session.get('email'):
+            flash("You are not authorized to view this order", "danger")
+            return redirect(url_for('client_orders.orders_history'))
+        
+    store = db.users.find_one(
+        {'_id': ObjectId(order['store_id'])},
+        {'store.name': 1, 'store.slug': 1, 'store.logo': 1, 'store.whats_app': 1}
+    )
+    
+    return render_template(
+        'orders/details.html',
+        order=order,
+        store=store['store'] if store else {},
+        statuses=ORDER_STATUS,
+        now=datetime.now()
+    )
+    
+@client_orders_bp.route("/orders/track/<order_id>")
+def track_order(order_id):
+    order = db.client_orders.find_one({'order_id': order_id})
+    if not order:
+        flash("Order not found", "danger")
+        return redirect(url_for("matketplace.home"))
+    
+    store = db.users.find_one(
+        {"_id": ObjectId(order['store_id'])},
+        {"store.name": 1, "store.slug": 1}
+    )
+    
+    return render_template(
+        'orders/track.html',
+        order=order,
+        store=store['store'] if store else {},
+        statuses=ORDER_STATUS,
+        now=datetime.now()
+    )
