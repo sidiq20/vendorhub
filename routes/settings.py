@@ -14,4 +14,7 @@ def init_db(mongo_db):
     
     
 # omo i'll fix it later how do i get the regex to work
-def validate_slug(slug)
+def validate_slug(slug):
+    return bool(re.match(r'^[a-zA-Z0-9-_]+$', slug)) # only alphanumeric, hyphen and underscore are allowed 
+# i don't understand the regex but it works
+# thank you claude and chatgpt

@@ -136,3 +136,69 @@ def view(order_id):
     return render_template("orders/view.html", order=order)
 
 @orders_bp.route("/orders/fullfill/<order_id>")
+@login_required
+def fullfill(order_id):
+    user_id = session.get("user_id")
+    
+    #Get order
+    order = db.orders.find_one({
+        '_id': ObjectId(order_id),
+        'user_id': user_id
+    })
+    
+    if not order:
+        flash("Order not found", "danger")
+        return redirect(url_for("orders.index"))
+    
+    
+    # update order status
+    db.orders.update_one(
+        {'_id': ObjectId(order_id)},
+        {
+            '$set': {
+                'status': 'fullfilled',
+                'update_at': datetime.now(),
+                'fullfilled_at': datetime.now()
+            }
+        }
+    )
+    
+    flash("Order marked as fullfilled", "success")
+    return redirect(url_for("orders.view", order_id=order_id))
+
+@orders_bp.route("/orders/cancel/<order_id>")
+@login_required
+def cancel(order_id):
+    user_id = session.get("user_id")
+    
+    # Get order
+    order = db.orders.find_one({
+        '_id': ObjectId(order_id),
+        'user_id': user_id
+    })
+    
+    if not order:
+        flash("Order not found", "danger")
+        return redirect(url_for("orders.index"))
+    
+    # update order status
+    for items in order["items"]:
+        db.products.update_one(
+            {'_id': ObjectId(items["product_id"])},
+            {'$inc': {'stock': items["quantity"]}}
+        )
+        
+    # update order status
+    db.orders.update_one(
+        {'_id': ObjectId(order_id)},
+        {
+            '$set': {
+                'status': 'canceled',
+                'update_at': datetime.now(),
+                'canceled_at': datetime.now()
+            }
+        }
+    )
+    
+    flash("Order canceled and inventory updated", "success")
+    return redirect(url_for("orders.view", order_id=order_id))

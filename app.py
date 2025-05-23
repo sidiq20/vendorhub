@@ -13,6 +13,11 @@ from routes.auth import auth_bp
 from routes.cart import cart_bp
 from routes.dashboard import dashboard_bp
 from routes.marketplace import marketplace_bp
+from routes.products import products_bp
+from routes.store import store_bp
+from routes.customers import customers_bp
+from routes.client_orders import client_orders_bp
+from routes.reviews import reviews_bp
 
 load_dotenv()
 
@@ -81,18 +86,33 @@ from routes import auth
 from routes import cart
 from routes import dashboard
 from routes import marketplace
+from routes import products
+from routes import store
+from routes import customers
+from routes import client_orders
+from routes import reviews
 
 
 auth.init_db(db)
 dashboard.init_db(db)
 cart.init_db(db)
 marketplace.init_db(db)
-
+products.init_db(db)
+store.init_db(db)
+customers.init_db(db)
+client_orders.init_db(db)
+reviews.init_db(db)
 
 # Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(cart_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(marketplace_bp)
+app.register_blueprint(products_bp)
+app.register_blueprint(store_bp)
+app.register_blueprint(customers_bp)
+app.register_blueprint(client_orders_bp)
+app.register_blueprint(reviews_bp)
 
 
 @app.after_request

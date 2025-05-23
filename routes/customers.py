@@ -26,7 +26,6 @@ def add():
     if request.method == "POST":
         user_id = session.get("user_id")
         name = request.form.get("name")
-        email = request.form.get("email")
         phone = request.form.get("phone")
         notes = request.form.get("notes")
         
@@ -58,7 +57,7 @@ def add():
         flash("Customer added successfully.", "success")
         return redirect(url_for("customers.index"))
     
-    return render_template("customers/add.html")
+    return render_template("customers/add.html", customer_id=customer_id)
 
 @customers_bp.route("/customers/edit/<customer_id>", methods=["GET", "POST"])
 @login_required
@@ -113,3 +112,57 @@ def edit(customer_id):
     
     return render_template("customers/edit.html", customer=customer)
 
+@customers_bp.route("/customers/delete/<customer_id>")
+@login_required
+def view(customer_id):
+    user_id = session.get('user_id')
+    
+    customer = db.customers.find_one({
+        '_id': ObjectId(customer_id),
+        'user_id': user_id
+    })
+    
+    
+    if not customer:
+        flash("customer not found", "danger")
+        return(url_for('customer.index'))
+    
+    #get customers order 
+    orders = list(db.orders.find({
+        '_id': user_id,
+        'customer_id': customer_id
+    }).sort('created_at', -1))
+    
+    return render_template('customers/view.html', customer, orders=orders)
+
+@customers_bp.route('/costomer/delete/<customer_id>')
+@login_required
+def delete(customer_id):
+    user_id = session.get('user_id')
+    
+    # get customer
+    customer = db.customer.find_one({
+        '_id': ObjectId(customer_id),
+        'user_id': user_id
+    })
+    
+    if not customer:
+        flash('customer not found', 'danger')
+        return redirect(url_for('customer.index'))
+    
+    #check if customer has orders 
+    order_count = db.customer.count_documents({
+        'user_id': user_id,
+        'customer_id': customer_id
+    })
+    
+    if order_count > 0:
+        flash("Cannot delete customer with existing orders", "danger")
+        return redirect(url_for('customer.view', customer_id=customer_id))
+    
+    # delete customer 
+    db.customer.delete_one({
+        '_id': ObjectId(customer_id)
+    })
+    flash("customer deleted successfully", "success")
+    return redirect(url_for("customer.index"))
