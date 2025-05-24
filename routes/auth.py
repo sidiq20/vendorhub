@@ -156,7 +156,11 @@ def register():
             flash(f"Registration failed: {str(e)}", "danger")
             return render_template("auth/register.html", config=firebase_config())
 
+    try:
         return render_template("auth/register.html", config=firebase_config())
+    except Exception as e:
+        print(" Error rendering register.html:", str(e))
+        return "Something went wrong", 500
 
 @auth_bp.route('/logout')
 def logout():
