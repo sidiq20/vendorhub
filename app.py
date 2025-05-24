@@ -18,6 +18,8 @@ from routes.store import store_bp
 from routes.customers import customers_bp
 from routes.client_orders import client_orders_bp
 from routes.reviews import reviews_bp
+from routes.settings import settings_bp
+from routes.orders import orders_bp
 
 load_dotenv()
 
@@ -91,6 +93,8 @@ from routes import store
 from routes import customers
 from routes import client_orders
 from routes import reviews
+from routes import settings
+from routes import orders
 
 
 auth.init_db(db)
@@ -102,6 +106,8 @@ store.init_db(db)
 customers.init_db(db)
 client_orders.init_db(db)
 reviews.init_db(db)
+settings.init_db(db)
+orders.init_db(db)
 
 # Register blueprints
 app.register_blueprint(auth_bp)
@@ -113,6 +119,8 @@ app.register_blueprint(store_bp)
 app.register_blueprint(customers_bp)
 app.register_blueprint(client_orders_bp)
 app.register_blueprint(reviews_bp)
+app.register_blueprint(settings_bp)
+app.register_blueprint(orders_bp)
 
 
 @app.after_request
