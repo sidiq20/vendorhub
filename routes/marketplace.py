@@ -41,7 +41,7 @@ def home():
     categories = db.products.distinct('category')
     
     return render_template(
-        'maretplace/home.html',
+        'marketplace/home.html',
         stores=stores,
         featured_products=featured_products,
         categories=categories,
