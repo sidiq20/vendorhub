@@ -65,7 +65,7 @@ def add():
                         continue
                     
                     # check if enough stock
-                    if product["stock"] < qauntity:
+                    if product["stock"] < quantity:
                         flash(f"Not enough stock for {product["name"]}", "danger")
                         return render_template("orders/add.html", products=products, customer=customer)
                     

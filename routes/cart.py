@@ -70,7 +70,7 @@ def view_cart():
             cart_items.append({
                 "product": product,
                 "store": store["store"] if store else {},
-                "qauntity": item["quantity"],
+                "quantity": item["quantity"],
                 "item_total": item_total
             })
             
@@ -139,7 +139,7 @@ def add_to_cart():
 def update_cart():
     """Update cart quantities"""
     product_id = request.form.get("product_id")
-    qauntity = int(request.form.get("quantity", 1))
+    quantity = int(request.form.get("quantity", 1))
     
     if not product_id:  
         flash("Product not fount", "damger")
@@ -151,7 +151,7 @@ def update_cart():
         flash("Product not found", "danger")
         return redirect(url_for("cart.view_cart"))
     
-    if qauntity <= 0:
+    if quantity <= 0:
         # remove item from cart
         db.carts.update_one(
             {"cart_id": session.get("cart_id")},

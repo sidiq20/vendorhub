@@ -71,7 +71,7 @@ def add():
         flash("Product added successfully", "success")
         return redirect(url_for("products.index"))
     
-    return render_template("products.add.html", product_id=product_id)
+    return render_template("products/add.html")
 
 @products_bp.route("/products/edit/<product_id>", methods=["GET", "POST"])
 @login_required

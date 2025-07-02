@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block title %}Search Results - VendorHub Marketplace{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Search Header -->
+    <div class="bg-white rounded-xl shadow-soft p-6 mb-8">
+        <h1 class="text-2xl font-bold text-neutral-800 mb">Search Results</h1>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('marketplace.search') }}" method="GET" class="flex flex-col md:flex-row gap-3">
+            <div class="flex-1">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search for products..." class="w-full px-4 py-2 rounded-lg border border-neutral-300 text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="w-full md:w-48">
+                <select name="category" class="w-full px-4 py-2 border border-neutral-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                    <option value="all" {% if category == 'all' or not category %} selected{% endif %}>All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="neu-button px-6 py-2">
+                Search
+                <i class="fas fa-search ml-2"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <div class="mb-8">
+        {% if products %}
+            <p class="text-neutral-600 mb-4">Found {{ products|length }} results for "<strong>{{ query }}</strong>" in <strong>{% endif %}{{ category if category != 'all' else 'All Categories' }}</strong>.</p>{% endif %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                {% for product in products %}
+                <div class="neu-card group hover:shadow-lg transition-all duration-300">
+                    <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-natural-100 mb-4">
+                        {% if product.image %}
+                        <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}" class="h-56 w-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                        <div class="h-48 w-full bg-neutral-200 flex items-center justify-center">
+                                <svg class="h-12 w-12 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-lg font-semibold text-neutral-800">{{ product.name }}</h3>
+                    <p class="mt-1 text-xl font-bold text-primary-600">&#8358; {{ product.price }}</p>
+                    <p class="text-sm text-neutral-500 mt-1">by <a href="{{ url_for('store.catalog', slug=product.store.slug) }}" class="text-primary-600 hover:text-primary-800">{{ product.store.name }}</a></p>
+
+                    <div class="mt-4 flex space-x-2">
+                        <a href="{{ url_for('store.product_detail', slug=product.store.slug, product_id=product._id) }}" class="flex-1 nue-button text-center hover-glow">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16 bg-white rounded-xl shadow-soft">
+                <svg class="mx-auto h-12 w-12 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-neutral-900">No products found</h3>
+                <p class="mt-1 text-sm text-neutral-500">Try adjusting your search or browse all products</p>
+                <a href="{{ url_for('marketplace.home') }}" class="mt-4 inline-block px-4 py-2 border border-neutral-300 rounded-xl shadow-sm text-sm font-medium text-neutral-700 bg-white hover:bg-neutral-50">
+                    Back to Marketplace
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

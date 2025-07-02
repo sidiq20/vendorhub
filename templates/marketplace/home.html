@@ -1,0 +1,146 @@
+{% extends 'layout.html' %}
+
+{% block title %}VendorHub Marketplace - Discover Products{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Hero section -->
+    <div class="bg-gradient-to-r from-primary-light to-primary-dark rounded-2xl shadow-lg p-8 mb-10 text-white">
+        <div class="max-w-3xl">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Discover Amazing Products</h1>
+            <p class="text-lg mb-6">Shop from a wide range of categories and find the best products for your needs.</p>
+
+            <form action="{{ url_for('marketplace.search') }}" method="GET" class="flex flex-col sm:flex-row gap-2">
+                <input type="text" name="q" placeholder="Search for products..." class="flex-1 px-4 py-2 rounded-lg border border-neutral-300 text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+                <button type="submit" class="bg-white text-primary font-medium px-6 py-3 rounded-xl hover:bg-neutral-100 transition-all duration-300">
+                    <i class="fas fa-search mr-2"></i> Search
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Featured Products -->
+    <div class="mb-12">
+        <div class="flex jusfity-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-neutral-800">Featured Products</h2>
+            <a href="{{ url_for('marketplace.search') }}" class="text-primary font-medium hover:underline">View All</a>
+        </div>
+
+        {% if featured_products %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in featured_products %}
+            <div class="bg-white rounded-xl shadow-card group hover:shadow-card-hover transform hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="relative aspect-w-1 aspect-h-1 w-full overflow-hidden">
+                    {% if product.image %}
+                    <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}" class="h-56 w-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                    <div class="h-56 w-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+                        <svg class="h-12 w-12 text-primary-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="absolute top-2 right-2 bg-white bg-opacity-90 rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <form action="{{ url_for('cart.add_to_cart') }}" method="POST" class="inline">
+                            <input type="hidden" name="product_id" value="{{ product._id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="text-primary-600 hover:text-primary-800 focus:outline-none" title="Add to cart">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="text-lg font-semibold text-neutral-800 line-clamp-1">{{ product.name }}</h3>
+                        <p class="text-lg font-bold text-primary-600">&#8358; {{ product.price }}</p>
+                    </div>
+                    <p class="text-sm text-neutral-500 mb-3">by <a href="{{ url_for('store.catalog', slug=product) }}" class="text-primary-600 hover:text-primary-800">{{ product.store.name }}
+                    </a></p>
+
+                    <a href="{{ url_for('store.product_detail', slug=product.store.slug, product_id=product._id) }}" class="block w-full py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white text-center rounded-lg transition-colors duration-300 font-medium text-sm">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16 bg-white rounded-xl shadow-soft">
+            <svg class="mx-auto h-12 w-12 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-neutral-900">No products available</h3>
+            <p class="mt-1 text-sm text-neutral-500">Check back soon for new products!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Caetgories -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold text-neutral-800 mb-6">Shop by Category</h2>
+
+        {% if categories %}
+        <div class="grid grid-cols-2 md:gird-cols-3 lg:grid-cols-6 gap-4">
+            {% for category in categories %}
+            <a href="{{ url_for('marketplace.category', category_name=category) }}" class="bg-white rounded-xl shadow-soft p-4 text-center hover:shadow-lg transition-all duration-300">
+                <div class="w-12 h-12 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="h-6 w-6 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                </div>
+                <p class="font-medium text-neutral-800">{{ category }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-white rounded-xl shadow-soft">
+            <p class="text-neutral-600"> No categorie available yet</p>
+        </div>
+        {% endif %}
+    </div> 
+
+    <!-- Featured Stores -->
+    <div class="mb-12">
+        <div class="flex jusfity-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-neutral-800">Featured stores</h2>
+            <a href="{{ url_for('marketplace.stores') }}" class="text-primary font-medium hover:underline">View All Stores</a>
+        </div>
+
+        {% if stores %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for store in stores %}
+             <a href="{{ url_for('store.catalog', slug=store.store.name) }}" class="neu-card group hover:shadow-lg transition-all duration-all duration-300 flex items-center">
+                <div class="w-16 h-16 bg-primary-light rounded-full flex items-center justofy-center mr-4 flex-shrink-0">
+                    {% if stores.store.logo %}
+                    <img src="{{ url_for('uploaded_file', filename=store.store.logo) }}" alt="{{ store.store.name }}" class="w-16 h-16 rounded-full object-cover">
+                    {% else %}
+                     <svg class="h-8 w-8 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-neutral-800">{{ store.store.name }}</h3>
+                    {% if store.store.description %}
+                    <p class="text-lg text-neutral-500 line-clamp-2">{{ store.store.description }}</p>
+                    {% else %}
+                    <p class="text-lg text-neutral-500">No description available</p>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16 bg-white rounded-xl shadow-soft">
+            <svg class="mx-auto h-12 w-12 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-neutral-900">No stores available</h3>
+            <p class="mt-1 text-sm text-neutral-500">Check back soon for new stores!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+         

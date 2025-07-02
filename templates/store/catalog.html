@@ -1,0 +1,257 @@
+h{% extends 'layout.html' %}
+
+{% block title %}{{ user.store.name }} - Online Store{% endblock %}
+
+{% block content %}
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#8BBCFF',
+                            DEFAULT: '#4F8BFF',
+                            dark: '#2563EB',
+                        },
+                        secondary: {
+                            light: '#FFD8A8',
+                            DEFAULT: '#FFBA7A',
+                            dark: '#F97316',
+                        },
+                        success: {
+                            light: '#86EFAC',
+                            DEFAULT: '#22C55E',
+                            dark: '#16A34A',
+                        },
+                        danger: {
+                            light: '#FCA5A5',
+                            DEFAULT: '#EF4444',
+                            dark: '#DC2626',
+                        },
+                        neutral: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            300: '#CBD5E1',
+                            400: '#94A3B8',
+                            500: '#64748B',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A',
+                        },
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px rgba(0, 0, 0, 0.08)',
+                        'neu': '5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff',
+                        'neu-inset': 'inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    },
+                },
+                fontFamily: {
+                    'sans': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    'display': ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        .neu-card {
+            @apply bg-white rounded-xl shadow-soft p-4;
+        }
+        .neu-button {
+            @apply bg-gradient-to-r from-primary to-primary-dark text-white font-medium py-2 px-4 rounded-xl shadow-soft transition-all duration-300 hover:shadow-lg hover:scale-105;
+        }
+        .hover-glow {
+            @apply transition-all duration-300 hover:shadow-[0_0_15px_rgba(79,139,255,0.5)];
+        }
+    </style>
+</head>
+<body class="bg-neutral-100 min-h-screen">
+    <div class="bg-gradient-to-r from-primary-light to-primary py-12 mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="text-white">
+                    <h1 class="text-3xl md:text-4xl font-bold font-display">{{ user.store.name }}</h1>
+                    {% if user.store.description %}
+                        <p class="mt-2 text-white/80 text-lg max-w-2xl">{{ user.store.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="mt-6 md:mt-0 flex space-x-4">
+                    <a href="https://wa.me/{{ user.store.whatsapp|replace('+', '') }}" target="_blank" 
+                       class="bg-white text-primary hover:bg-primary-dark hover:text-white transition-colors duration-300 
+                              px-6 py-3 rounded-lg shadow-lg flex items-center font-medium">
+                        <svg class="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M20.5027 3.49794C18.2877 1.28094 15.3097 0.000944137 12.1597 0.000944137C5.50168 0.000944137 0.0866756 5.41594 0.0866756 12.0749C0.0866756 14.2089 0.648676 16.2889 1.71768 18.1069L0 24.0019L6.04169 22.3179C7.79169 23.2879 9.95068 23.7999 12.1547 23.7999H12.1597C18.8137 23.7999 24.2297 18.3849 24.2297 11.7259C24.2297 8.57694 22.7177 5.71394 20.5027 3.49794ZM12.1597 21.7949C10.1787 21.7949 8.24469 21.3019 6.56969 20.3759L6.22869 20.1729L2.69369 21.1649L3.70269 17.7299L3.47969 17.3749C2.45969 15.6369 1.91968 13.6259 1.91968 11.5749C1.91968 6.46794 6.55269 2.33994 12.1647 2.33994C14.7787 2.33994 17.2327 3.37894 19.0527 5.19894C20.8727 7.01894 22.4047 9.47294 22.4047 12.0749C22.3997 17.1819 17.7667 21.7949 12.1597 21.7949ZM17.6507 14.5869C17.3607 14.4419 15.8647 13.7069 15.5997 13.6089C15.3347 13.5119 15.1427 13.4629 14.9507 13.7539C14.7587 14.0449 14.1767 14.7309 14.0097 14.9229C13.8427 15.1149 13.6757 15.1389 13.3857 14.9939C13.0957 14.8489 12.0927 14.5129 10.8957 13.4629C9.96469 12.6459 9.33769 11.6429 9.17069 11.3519C9.00369 11.0609 9.15269 10.9079 9.29469 10.7659C9.42169 10.6379 9.57769 10.4339 9.71969 10.2669C9.86169 10.0999 9.91069 9.97794 10.0077 9.78594C10.1047 9.59394 10.0557 9.42694 9.98269 9.28194C9.90969 9.13694 9.28269 7.64094 9.04169 7.05894C8.80769 6.49394 8.56969 6.56694 8.39269 6.55694C8.22569 6.54694 8.03369 6.54694 7.84169 6.54694C7.64969 6.54694 7.33469 6.61994 7.06969 6.91094C6.80469 7.20194 6.01769 7.93694 6.01769 9.43294C6.01769 10.9289 7.09469 12.3769 7.23669 12.5689C7.37869 12.7609 9.33069 15.7729 12.3177 17.0729C13.0717 17.4119 13.6627 17.6169 14.1237 17.7699C14.8777 18.0219 15.5657 17.9829 16.1077 17.9079C16.7077 17.8259 17.9407 17.1819 18.1817 16.5029C18.4227 15.8239 18.4227 15.2419 18.3497 15.1199C18.2767 14.9979 18.0847 14.9229 17.6507 14.5869Z"/>
+                        </svg>
+                        Contact Us
+                    </a>
+                    <a href="{{ url_for('cart.view_cart') }}" class="bg-white text-primary hover:bg-primary-dark hover:text-white transition-colors duration-300 
+                              px-6 py-3 rounded-lg shadow-lg flex items-center font-medium">
+                        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        View Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 mb-8">
+        <div class="bg-white rounded-xl shadow-soft p-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative flex-1">
+                    <form action="" method="GET" class="w-full">
+                        <div class="relative">
+                            <input type="text" name="search" placeholder="Search Prodcucts... "
+                                class="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+                                value="{{ request.args.get('search', '') }}">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Sort Options -->
+                <div class="flex-shrink-0">
+                    <select name="sort" id="sort" onchange="this.form.submit()" 
+                        class="pl-3 pr-10 py-2 text-base border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300">
+                        <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="price_low" {% if request.args.get('sort') == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if request.args.get('sort') == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="popular" {% if request.args.get('sort') == 'popular' %}selected{% endif %}>Most Popular</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% if products %}
+            <div class="gird gird-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for product in products %}
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="relative">
+                            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-neutral-100">
+                                {% if product.image %}
+                                    <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}"
+                                        class="h-64 w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-500">
+                                {% else %}
+                                    <div class="h-64 w-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center">
+                                        <svg class="h-16 w-16 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <form action="{{ url_for('cart.add_to_cart') }}"
+                                method="POST" class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <input type="hidden" name="product_id" value="{{ product._id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="bg-white text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-6 py-2 rounded-lg shadow-lg font-medium flex items-center" {% if product.stock <= 0 %}disabled{% endif %}>
+                                        <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        Quick Add
+                                    </button>
+                                </form>
+                            </div>
+
+                            {% if product.stock <= 0 %}
+                                <div class="absolute top-4 right-4 bg-danger text-white text-xs font-bold px-2 py-1 rounded-md">
+                                    Out of stock
+                                </div>
+                            {% elif product.stock <= 5 %}
+                                <div class="absolute top-4 right-4 bg-secondary-dark text-white text-xs font-bold px-2 py-1 rounded-md">
+                                    Low Stock 
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="p-5">
+                            <div class="flex jusfity-between items-start">
+                                <h3 class="text-lg font-semibold text-neutral-800 hover:text-primary transition-colors duration-300">
+                                    <a href="{{ url_for('store.product_detail', slug=user.store.slug, product_id=product._id) }}"
+                                    class="hover:underline">
+                                        {{ product.name }}
+                                    </a>
+                                </h3>
+                                <p class="text-xl font-bold text-primary">${{ product.price }}</p>
+                            </div>
+
+                            <div class="mt-2 flex items-center">
+                                {% set avg_rating = product.avg_rating|default(0) %}
+                                {% for 1 in range(1, 6) %}
+                                    {% if i <= avg_rating|round(0, 'floor') %}
+                                        <svg class="h-4 w-4 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    {% else %}
+                                        <svg class="h-4 w-4 text-neutral-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if product.review_count|default(0) > 0 %}
+                                    <span class="ml-l text-xs text-neutral-500">({{ product.review_count }})</span>
+                                {% endif %}
+                            </div>
+
+                            {% if product.description %}
+                                <p class="mt-2 test-sm text-neutral-600 line-clamp-2">{{ product.description }}</span>
+                            {% endif %}
+                        
+                            <div class="mt-4">
+                                <a href="{{ url_for('store.product_detail', slug=user.store.slug, product_id=product._id) }}" class="block w-full text-center px-4 py-2 border border-primary rounded-lg text-primary hover:bg-primary hover:text-white transition-colors duration-300 font-medium">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white rounded-xl shadow-md p-12 text-center max-w-lg mx-auto">
+                <div class="bg-neutral-100 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="h-12 w-12 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-neutral-800 mb-2">No Products Available</h3>
+                <p class="text-neutral-600 mb-6">We're working on adding new products to our store. Please check back soon!</p>
+                <a href="javascript:window.location.reload()" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-300">
+                    <svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh Page
+                </a>
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-soft mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm text-neutral-600">&copy; {{ user.store.name }} {{ now.year }}</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <p class="text-sm text-neutral-500">Powered by <span class="font-medium text-primary">VendorHub</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+{% endblock %}

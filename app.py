@@ -1,6 +1,6 @@
 import os 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, flash, session, send_from_directory, request
 from pymongo import response, server, mongo_client, MongoClient
 import firebase_admin
@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 # initalize app 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
+app.permanent_session_lifetime = timedelta(days=7)
 
 # configure
 MONGO_URI = os.environ.get('MONGO_URI')

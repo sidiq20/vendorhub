@@ -1,702 +1,923 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SocialHub{% endblock %}</title>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}VendorHub{% endblock %}</title>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <!-- Google Fonts - Inter and Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Tailwind Config -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        heading: ['Poppins', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
-                            950: '#3b0764',
-                        },
-                        secondary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                            950: '#082f49',
-                        },
-                        success: {
-                            light: '#86EFAC',
-                            DEFAULT: '#22C55E',
-                            dark: '#16A34A',
-                        },
-                        danger: {
-                            light: '#FCA5A5',
-                            DEFAULT: '#EF4444',
-                            dark: '#DC2626',
-                        },
-                    },
-                    boxShadow: {
-                        card: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                        'card-hover': '0 10px 25px rgba(139, 92, 246, 0.15)',
-                    },
-                    borderRadius: {
-                        'xl': '1rem',
-                        '2xl': '1.5rem',
-                        '3xl': '2rem',
-                    },
-                },
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              heading: ["Poppins", "sans-serif"],
             },
-        }
+            colors: {
+              primary: {
+                50: "#f5f3ff",
+                100: "#ede9fe",
+                200: "#ddd6fe",
+                300: "#c4b5fd",
+                400: "#a78bfa",
+                500: "#8b5cf6",
+                600: "#7c3aed",
+                700: "#6d28d9",
+                800: "#5b21b6",
+                900: "#4c1d95",
+                950: "#3b0764",
+              },
+              secondary: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                200: "#bae6fd",
+                300: "#7dd3fc",
+                400: "#38bdf8",
+                500: "#0ea5e9",
+                600: "#0284c7",
+                700: "#0369a1",
+                800: "#075985",
+                900: "#0c4a6e",
+                950: "#082f49",
+              },
+              success: {
+                light: "#86EFAC",
+                DEFAULT: "#22C55E",
+                dark: "#16A34A",
+              },
+              danger: {
+                light: "#FCA5A5",
+                DEFAULT: "#EF4444",
+                dark: "#DC2626",
+              },
+            },
+            boxShadow: {
+              card: "0 4px 20px rgba(0, 0, 0, 0.08)",
+              "card-hover": "0 10px 25px rgba(139, 92, 246, 0.15)",
+            },
+            borderRadius: {
+              xl: "1rem",
+              "2xl": "1.5rem",
+              "3xl": "2rem",
+            },
+          },
+        },
+      };
     </script>
-    
+
     <!-- Custom CSS -->
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+      }
 
-        ::-webkit-scrollbar-thumb {
-            background: #8b5cf6;
-            border-radius: 10px;
-        }
+      ::-webkit-scrollbar-thumb {
+        background: #8b5cf6;
+        border-radius: 10px;
+      }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7c3aed;
-        }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #7c3aed;
+      }
 
-        /* Custom animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+      /* Custom animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
+      .fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
 
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
         }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
 
-        .slide-in-right {
-            animation: slideInRight 0.4s ease-out;
-        }
+      .slide-in-right {
+        animation: slideInRight 0.4s ease-out;
+      }
 
-        /* Modern Card Effects */
-        .card-modern {
-            border-radius: 16px;
-            background: #ffffff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(229, 231, 235, 0.5);
-        }
+      /* Mobile menu animation */
+      .mobile-menu {
+        transition: opacity 0.3s ease;
+      }
 
-        .card-modern:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
-        }
+      .mobile-menu > div {
+        transition: transform 0.3s ease;
+      }
 
-        .card-glass {
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
+      .mobile-menu.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
 
-        .input-modern {
-            border-radius: 12px;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-        }
+      .mobile-menu.hidden > div {
+        transform: translateX(-100%);
+      }
 
-        .input-modern:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
+      /* Modern Card Effects */
+      .card-modern {
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid rgba(229, 231, 235, 0.5);
+      }
 
-        .btn-modern {
-            border-radius: 12px;
-            background: linear-gradient(145deg, #8b5cf6, #7c3aed);
-            color: white;
-            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
-            transition: all 0.3s ease;
-        }
+      .card-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+      }
 
-        .btn-modern:hover {
-            background: linear-gradient(145deg, #7c3aed, #6d28d9);
-            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
-            transform: translateY(-2px);
-        }
+      .card-glass {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
 
-        .btn-modern:active {
-            box-shadow: 0 2px 5px rgba(124, 58, 237, 0.3);
-            transform: translateY(0);
-        }
+      .input-modern {
+        border-radius: 12px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+      }
 
-        /* Sidebar improvements */
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-            color: #4b5563;
-        }
+      .input-modern:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+      }
 
-        .sidebar-item:hover {
-            background-color: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
-        }
+      .btn-modern {
+        border-radius: 12px;
+        background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+        color: white;
+        box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        transition: all 0.3s ease;
+      }
 
-        .sidebar-item.active {
-            background-color: rgba(139, 92, 246, 0.15);
-            color: #8b5cf6;
-            font-weight: 500;
-        }
+      .btn-modern:hover {
+        background: linear-gradient(145deg, #7c3aed, #6d28d9);
+        box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+        transform: translateY(-2px);
+      }
 
-        .sidebar-item i {
-            margin-right: 0.75rem;
-            font-size: 1.1rem;
-            width: 1.5rem;
-            text-align: center;
-        }
+      .btn-modern:active {
+        box-shadow: 0 2px 5px rgba(124, 58, 237, 0.3);
+        transform: translateY(0);
+      }
+
+      /* Sidebar improvements */
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+        color: #4b5563;
+      }
+
+      .sidebar-item:hover {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+      }
+
+      .sidebar-item.active {
+        background-color: rgba(139, 92, 246, 0.15);
+        color: #8b5cf6;
+        font-weight: 500;
+      }
+
+      .sidebar-item i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+        width: 1.5rem;
+        text-align: center;
+      }
+
+      /* Mobile navigation item */
+      .mobile-nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+        color: #4b5563;
+      }
+
+      .mobile-nav-item:hover {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+      }
+
+      .mobile-nav-item.active {
+        background-color: rgba(139, 92, 246, 0.15);
+        color: #8b5cf6;
+        font-weight: 500;
+      }
+
+      .mobile-nav-item i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+        width: 1.5rem;
+        text-align: center;
+      }
+
+      /* Flash message animation */
+      .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out;
+      }
     </style>
     {% block head %}{% endblock %}
-</head>
-<body class="bg-gray-50 min-h-screen font-sans">
+  </head>
+  <body class="bg-gray-50 min-h-screen font-sans">
     {% if session.get('user_id') %}
     <!-- Authenticated Layout -->
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="hidden md:flex md:flex-col w-72 bg-white shadow-lg border-r border-gray-100">
-            <div class="p-6 flex items-center">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-3">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800 font-heading">Social<span class="text-primary-600">Hub</span></h2>
+      <!-- Sidebar -->
+      <aside
+        class="hidden md:flex md:flex-col w-72 bg-white shadow-lg border-r border-gray-100"
+      >
+        <div class="p-6 flex items-center">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-3"
+          >
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 font-heading">
+            Vendor<span class="text-primary-600">Hub</span>
+          </h2>
+        </div>
+
+        <div class="px-4 py-2">
+          <div class="card-glass p-3 mb-6 flex items-center">
+            <div
+              class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3"
+            >
+              {{ session.get('email', 'U')[0].upper() }}
             </div>
-            
-            <div class="px-4 py-2">
-                <div class="card-glass p-3 mb-6 flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3">
-                        {{ session.get('email', 'U')[0].upper() }}
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-800">{{ user.name if user else session.get('email') }}</p>
-                        <p class="text-xs text-gray-500">{{ user.email if user else session.get('email') }}</p>
-                    </div>
-                </div>
+            <div>
+              <p class="text-sm font-medium text-gray-800">
+                {{ user.name if user else session.get('email') }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ user.email if user else session.get('email') }}
+              </p>
             </div>
-            
-            <nav class="flex-1 px-4 py-2">
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 pl-4">Main Menu</p>
-                <ul>
-                    <li class="mb-2">
-                        <a href="{{ url_for('dashboard.index') }}" class="sidebar-item {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('products.index') }}" class="sidebar-item {% if request.endpoint and 'products.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-box"></i>
-                            <span>Products</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('orders.index') }}" class="sidebar-item {% if request.endpoint and 'orders.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Orders</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('customers.index') }}" class="sidebar-item {% if request.endpoint and 'customers.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-users"></i>
-                            <span>Customers</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('marketplace.home') }}" class="sidebar-item {% if request.endpoint and 'marketplace.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-store"></i>
-                            <span>Marketplace</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('client_orders.order_history') }}" class="sidebar-item {% if request.endpoint and 'client_orders.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Client Orders</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('reviews.index') }}" class="sidebar-item {% if request.endpoint and 'reviews.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-star"></i>
-                            <span>Reviews</span>
-                        </a>
-                    </li>
-                </ul>
-                
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 mt-8 pl-4">Settings</p>
-                <ul>
-                    <li class="mb-2">
-                        <a href="{{ url_for('settings.index') }}" class="sidebar-item {% if request.endpoint and 'settings.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-gear"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="{{ url_for('auth.logout') }}" class="sidebar-item text-red-500 hover:text-red-600 hover:bg-red-50">
-                            <i class="fas fa-right-from-bracket"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                </ul>
+          </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-2 overflow-y-auto">
+          <p
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 pl-4"
+          >
+            Main Menu
+          </p>
+          <ul>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('dashboard.index') }}"
+                class="sidebar-item {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}"
+              >
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('products.index') }}"
+                class="sidebar-item {% if request.endpoint and 'products.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('orders.index') }}"
+                class="sidebar-item {% if request.endpoint and 'orders.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('customers.index') }}"
+                class="sidebar-item {% if request.endpoint and 'customers.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('marketplace.home') }}"
+                class="sidebar-item {% if request.endpoint and 'marketplace.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-store"></i>
+                <span>Marketplace</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('client_orders.orders_history') }}"
+                class="sidebar-item {% if request.endpoint and 'client_orders.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-clipboard-list"></i>
+                <span>Client Orders</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('reviews.index') }}"
+                class="sidebar-item {% if request.endpoint and 'reviews.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+              </a>
+            </li>
+          </ul>
+
+          <p
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 mt-8 pl-4"
+          >
+            Settings
+          </p>
+          <ul>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('settings.index') }}"
+                class="sidebar-item {% if request.endpoint and 'settings.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-gear"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+            <li class="mb-2">
+              <a
+                href="{{ url_for('auth.logout') }}"
+                class="sidebar-item text-red-500 hover:text-red-600 hover:bg-red-50"
+              >
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="px-6 py-4 mt-auto">
+          <div class="bg-primary-50 p-4 rounded-xl">
+            <p class="text-xs text-primary-600 font-medium mb-2">Need help?</p>
+            <p class="text-xs text-gray-600 mb-3">
+              Contact our support team for assistance
+            </p>
+            <a
+              href="#"
+              class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              <i class="fas fa-headset mr-1"></i> Contact Support
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Mobile menu -->
+      <div class="md:hidden fixed top-0 inset-x-0 z-50 bg-white shadow-lg">
+        <div class="flex items-center justify-between px-4 py-3">
+          <div class="flex items-center">
+            <button
+              type="button"
+              class="mobile-menu-button text-gray-500 hover:text-gray-700 focus:outline-none mr-3"
+            >
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-800 font-heading">
+              {% block header %}Dashboard{% endblock %}
+            </h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <!-- Cart Icon with Counter -->
+            <a
+              href="{{ url_for('cart.view_cart') }}"
+              class="relative text-gray-500 hover:text-primary-600 focus:outline-none transition-colors duration-200"
+            >
+              <i class="fas fa-shopping-cart text-lg"></i>
+              <span
+                id="mobile-cart-count"
+                class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-primary-600 text-white text-xs rounded-full"
+                >0</span
+              >
+            </a>
+            <button
+              class="relative text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              <i class="fas fa-bell text-lg"></i>
+              <span
+                class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="mobile-menu hidden md:hidden fixed inset-0 z-40 bg-black bg-opacity-50"
+      >
+        <div
+          class="absolute inset-y-0 left-0 w-4/5 max-w-xs bg-white shadow-xl h-full overflow-y-auto"
+        >
+          <div class="flex flex-col h-full">
+            <div
+              class="flex items-center justify-between px-4 py-4 border-b border-gray-100"
+            >
+              <div class="flex items-center">
+                <div
+                  class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-2"
+                >
+                  <i class="fas fa-chart-line text-sm"></i>
+                </div>
+                <h1 class="text-lg font-bold text-gray-800 font-heading">
+                  Vendor<span class="text-primary-600">Hub</span>
+                </h1>
+              </div>
+              <button
+                type="button"
+                class="mobile-menu-close text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <i class="fas fa-xmark text-xl"></i>
+              </button>
+            </div>
+
+            <div class="px-4 py-3">
+              <div class="card-glass p-3 mb-4 flex items-center">
+                <div
+                  class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3"
+                >
+                  {{ session.get('email', 'U')[0].upper() }}
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">
+                    {{ user.name if user else session.get('email') }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    {{ user.email if user else session.get('email') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-2 overflow-y-auto">
+              <p
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 pl-3"
+              >
+                Main Menu
+              </p>
+              <a
+                href="{{ url_for('dashboard.index') }}"
+                class="mobile-nav-item {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}"
+              >
+                <i class="fas fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+              <a
+                href="{{ url_for('products.index') }}"
+                class="mobile-nav-item {% if request.endpoint and 'products.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+              </a>
+              <a
+                href="{{ url_for('orders.index') }}"
+                class="mobile-nav-item {% if request.endpoint and 'orders.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+              </a>
+              <a
+                href="{{ url_for('customers.index') }}"
+                class="mobile-nav-item {% if request.endpoint and 'customers.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+              </a>
+              <a
+                href="{{ url_for('marketplace.home') }}"
+                class="mobile-nav-item {% if request.endpoint and 'marketplace.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-store"></i>
+                <span>Marketplace</span>
+              </a>
+              <a
+                href="{{ url_for('client_orders.orders_history') }}"
+                class="mobile-nav-item {% if request.endpoint and 'client_orders.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-clipboard-list"></i>
+                <span>Client Orders</span>
+              </a>
+              <a
+                href="{{ url_for('reviews.index') }}"
+                class="mobile-nav-item {% if request.endpoint and 'reviews.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+              </a>
+
+              <p
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-6 pl-3"
+              >
+                Settings
+              </p>
+              <a
+                href="{{ url_for('settings.index') }}"
+                class="mobile-nav-item {% if request.endpoint and 'settings.' in request.endpoint %}active{% endif %}"
+              >
+                <i class="fas fa-gear"></i>
+                <span>Settings</span>
+              </a>
+              <a
+                href="{{ url_for('auth.logout') }}"
+                class="mobile-nav-item text-red-500"
+              >
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </a>
             </nav>
-            
-            <div class="px-6 py-4 mt-auto">
-                <div class="bg-primary-50 p-4 rounded-xl">
-                    <p class="text-xs text-primary-600 font-medium mb-2">Need help?</p>
-                    <p class="text-xs text-gray-600 mb-3">Contact our support team for assistance</p>
-                    <a href="#" class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors">
-                        <i class="fas fa-headset mr-1"></i> Contact Support
-                    </a>
-                </div>
-            </div>
-        </aside>
 
-        <!-- Mobile menu -->
-        <div class="md:hidden fixed top-0 inset-x-0 z-50 bg-white shadow-lg">
-            <div class="flex items-center justify-between px-4 py-3">
-                <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-2">
-                        <i class="fas fa-chart-line text-sm"></i>
-                    </div>
-                    <h1 class="text-lg font-bold text-gray-800 font-heading">Social<span class="text-primary-600">Hub</span></h1>
-                </div>
-                <button type="button" class="mobile-menu-button text-gray-500 hover:text-gray-700 focus:outline-none"> 
-                    <i class="fas fa-bars text-xl"></i>
+            <div class="px-4 py-4 mt-auto border-t border-gray-100">
+              <div class="bg-primary-50 p-3 rounded-xl">
+                <p class="text-xs text-primary-600 font-medium mb-1">
+                  Need help?
+                </p>
+                <a
+                  href="#"
+                  class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  <i class="fas fa-headset mr-1"></i> Contact Support
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="flex flex-col flex-1 overflow-hidden">
+        <header class="bg-white shadow-sm z-10 border-b border-gray-100">
+          <div class="flex items-center justify-between px-4 py-4 md:px-6">
+            <h1
+              class="hidden md:block text-xl font-semibold text-gray-800 font-heading"
+            >
+              {% block header_desktop %}{% block header_content %}Dashboard{%
+              endblock %}{% endblock %}
+            </h1>
+            <div class="flex items-center space-x-4">
+              <!-- Cart Icon with Counter -->
+              <a
+                href="{{ url_for('cart.view_cart') }}"
+                class="relative text-gray-500 hover:text-primary-600 focus:outline-none transition-colors duration-200"
+              >
+                <i class="fas fa-shopping-cart text-lg"></i>
+                <span
+                  id="cart-count"
+                  class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-primary-600 text-white text-xs rounded-full"
+                  >0</span
+                >
+              </a>
+              <button
+                class="relative text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <i class="fas fa-bell text-lg"></i>
+                <span
+                  class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+                ></span>
+              </button>
+              <div class="hidden md:block relative">
+                <button class="flex items-center space-x-2 focus:outline-none">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600"
+                  >
+                    {{ session.get('email', 'U')[0].upper() }}
+                  </div>
+                  <span class="text-sm text-gray-700"
+                    >{{ user.name if user else session.get('email',
+                    '').split('@')[0] }}</span
+                  >
+                  <i class="fas fa-chevron-down text-xs text-gray-500"></i>
                 </button>
+              </div>
             </div>
-        </div>
-
-        <div class="mobile-menu hidden md:hidden fixed inset-0 z-40 bg-black bg-opacity-50">
-            <div class="absolute inset-y-0 left-0 w-4/5 max-w-xs bg-white shadow-xl transform transition-transform duration-300">
-                <div class="flex flex-col h-full">
-                    <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-2">
-                                <i class="fas fa-chart-line text-sm"></i>
-                            </div>
-                            <h1 class="text-lg font-bold text-gray-800 font-heading">Social<span class="text-primary-600">Hub</span></h1>
-                        </div>
-                        <button type="button" class="mobile-menu-close text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i class="fas fa-xmark text-xl"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="px-4 py-3">
-                        <div class="card-glass p-3 mb-4 flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3">
-                                {{ session.get('email', 'U')[0].upper() }}
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">{{ user.name if user else session.get('email') }}</p>
-                                <p class="text-xs text-gray-500">{{ user.email if user else session.get('email') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <nav class="flex-1 px-4 py-2 overflow-y-auto">
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 pl-3">Main Menu</p>
-                        <a href="{{ url_for('dashboard.index') }}" class="mobile-nav-item {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ url_for('products.index') }}" class="mobile-nav-item {% if request.endpoint and 'products.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-box"></i>
-                            <span>Products</span>
-                        </a>
-                        <a href="{{ url_for('orders.index') }}" class="mobile-nav-item {% if request.endpoint and 'orders.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Orders</span>
-                        </a>
-                        <a href="{{ url_for('customers.index') }}" class="mobile-nav-item {% if request.endpoint and 'customers.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-users"></i>
-                            <span>Customers</span>
-                        </a>
-                        
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-6 pl-3">Settings</p>
-                        <a href="{{ url_for('settings.index') }}" class="mobile-nav-item {% if request.endpoint and 'settings.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-gear"></i>
-                            <span>Settings</span>
-                        </a>
-                        <a href="{{ url_for('auth.logout') }}" class="mobile-nav-item text-red-500">
-                            <i class="fas fa-right-from-bracket"></i>
-                            <span>Logout</span>
-                        </a>
-                    </nav>
-                    
-                    <div class="px-4 py-4 mt-auto border-t border-gray-100">
-                        <div class="bg-primary-50 p-3 rounded-xl">
-                            <p class="text-xs text-primary-600 font-medium mb-1">Need help?</p>
-                            <a href="#" class="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors">
-                                <i class="fas fa-headset mr-1"></i> Contact Support
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          </div>
+        </header>
+        <main
+          class="relative flex-1 overflow-y-auto focus:outline-none md:py-6 md:px-8 px-4 py-6 mt-14 md:mt-0"
+        >
+          <!-- Flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <div class="mb-6">
+            {% for category, message in messages %}
+            <div
+              class="flex items-center px-4 py-3 rounded-lg shadow-sm border-l-4 {% if category == 'error' or category == 'danger' %}bg-red-50 border-red-500 text-red-700{% elif category == 'success' %}bg-green-50 border-green-500 text-green-700{% elif category == 'warning' %}bg-yellow-50 border-yellow-500 text-yellow-700{% else %}bg-blue-50 border-blue-500 text-blue-700{% endif %} mb-3 animate-fadeIn"
+            >
+              <div class="mr-3 flex-shrink-0">
+                {% if category == 'error' or category == 'danger' %}
+                <i class="fas fa-circle-exclamation text-red-500"></i>
+                {% elif category == 'success' %}
+                <i class="fas fa-circle-check text-green-500"></i>
+                {% elif category == 'warning' %}
+                <i class="fas fa-triangle-exclamation text-yellow-500"></i>
+                {% else %}
+                <i class="fas fa-circle-info text-blue-500"></i>
+                {% endif %}
+              </div>
+              <div class="flex-1 text-sm font-medium">{{ message }}</div>
+              <button
+                class="ml-auto text-gray-400 hover:text-gray-500 focus:outline-none"
+                onclick="this.parentElement.remove()"
+              >
+                <i class="fas fa-xmark"></i>
+              </button>
             </div>
-        </div>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %}
 
-        <!-- Mobile Sidebar (slide-in) -->
-        <div id="mobileSidebar" class="fixed inset-0 z-50 bg-black bg-opacity-40 hidden transition-opacity duration-200 md:hidden">
-            <div class="absolute inset-y-0 left-0 w-4/5 max-w-xs bg-white shadow-xl transform -translate-x-full transition-transform duration-300" id="mobileSidebarPanel">
-                <div class="flex flex-col h-full">
-                    <!-- Sidebar content (copy from your desktop sidebar) -->
-                    <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center text-white mr-2">
-                                <i class="fas fa-chart-line text-sm"></i>
-                            </div>
-                            <h1 class="text-lg font-bold text-gray-800 font-heading">Social<span class="text-primary-600">Hub</span></h1>
-                        </div>
-                        <button type="button" id="mobileSidebarClose" class="text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i class="fas fa-xmark text-xl"></i>
-                        </button>
-                    </div>
-                    <div class="px-4 py-2">
-                        <div class="card-glass p-3 mb-6 flex items-center">
-                            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3">
-                                {{ session.get('email', 'U')[0].upper() }}
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">{{ user.name if user else session.get('email') }}</p>
-                                <p class="text-xs text-gray-500">{{ user.email if user else session.get('email') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <nav class="flex-1 px-4 py-2 overflow-y-auto">
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 pl-3">Main Menu</p>
-                        <a href="{{ url_for('dashboard.index') }}" class="sidebar-item {% if request.endpoint and request.endpoint == 'dashboard.index' %}active{% endif %}">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ url_for('products.index') }}" class="sidebar-item {% if request.endpoint and 'products.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-box"></i>
-                            <span>Products</span>
-                        </a>
-                        <a href="{{ url_for('orders.index') }}" class="sidebar-item {% if request.endpoint and 'orders.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Orders</span>
-                        </a>
-                        <a href="{{ url_for('customers.index') }}" class="sidebar-item {% if request.endpoint and 'customers.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-users"></i>
-                            <span>Customers</span>
-                        </a>
-                        <a href="{{ url_for('marketplace.home') }}" class="sidebar-item {% if request.endpoint and 'marketplace.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-store"></i>
-                            <span>Marketplace</span>
-                        </a>
-                        <a href="{{ url_for('client_orders.order_history') }}" class="sidebar-item {% if request.endpoint and 'client_orders.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Client Orders</span>
-                        </a>
-                        <a href="{{ url_for('reviews.index') }}" class="sidebar-item {% if request.endpoint and 'reviews.' in request.endpoint %}active{% endif %}">
-                            <i class="fas fa-star"></i>
-                            <span>Reviews</span>
-                        </a>
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex flex-col flex-1 overflow-hidden">
-            <header class="bg-white shadow-sm z-10 border-b border-gray-100">
-                <div class="flex items-center justify-between px-4 py-4 md:px-6">
-                    <div class="flex items-center md:hidden">
-                        <button type="button" class="mobile-menu-button text-gray-500 hover:text-gray-700 focus:outline-none mr-3">
-                            <i class="fas fa-bars "></i>
-                        </button>
-                        <h1 class="text-lg font-bold text-gray-800 font-heading">{% block header %}Dashboard{% endblock %}</h1>
-                    </div>
-                    <h1 class="hidden md:block text-xl font-semibold text-gray-800
-                    font-heading">{% block header_desktop %}{% clock header_content %}Dashboard{% endblock %}{% endblock %}</h1>
-                    <div class="flex items-center space-x-4">
-                        {% comment %} cart icon with counter {% endcomment %}
-                        <a href="{{ url_for('cart.view_cart') }}" class="relative text-gray-500 hover:text-primary-600 focus:outline-none transition-colors duration-200">
-                            <i class="fas fa-shopping-cart text-lg"></i>
-                            <span id="cart-count" class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-primary-600 text-white text-xs rounded-full font-semibold">0</span>
-                        </a>
-                        <button class="relative text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i class="fas fa-bell text-lg"></li>
-                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
-                        <div class="hidden md:block relative">
-                            <button class="flex items-center space-x-2 focus:outline-none">
-                                <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                                    {{ session.get('email', 'U')[0].upper() }}
-                                </div>
-                                <span class="text-sm text-gray-700">{{ user.name if user else session.get('email', '').split('@')[0] }}</span>
-                                <i class="fas fa-chevron-down text-xs text-gray-500"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>   
-            <main class="relative flex-1 overflow-y-auto focus:outline-none md:py-6 md:px-6 py-6 mt-14 md:mt-0">
-                {% comment %} flash messages {% endcomment %}
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        <div class="mb-6">
-                            {% for category, messge in messages %}
-                                <div class="flex items-center px-4 py-3 rounded-lg shadow-sm border-l-4  {% if category == 'error' %} bg-red-50 border-red-500 text-red-700 {% elif category == 'success' %} bg-green-50 border-green-500 text-green-700 {% elif category == 'warning' %} bg-yellow-50 border-yellow-500 text-yellow-700{% else %}bg-blue-50 border-blue-500 text-blue-700 {% endif %} mb-3 animate-fadeIn">
-                                    <div class="mr-3 flex-shrink-0">
-                                        {% if category == 'error' %}
-                                        <i class="fas fa-circle-excamation text-red-500"></i>
-                                        {% elif category == 'success' %}
-                                            <i class="fas fa-circle-check text-green-500"></i>
-                                        {% elif category == 'warning' %}
-                                            <i class="fas fa-triangle-exclamation text-yellow-500"></i>
-                                        {% else %}
-                                            <i class="fas fa-circle-info text-blue-500"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="flex-1 text-sm font-medium">
-                                        {{ message }}</div>
-                                    <button class="ml-auto text-gray-400
-                                    hover:text-gray-500 focus:outline-none" onclick="this.parentElement.remove()">
-                                        <i class="fas fa-xmark"></i>
-                                    </button>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endwith %}
-
-                {% comment %} Page content  {% endcomment %}
-                {% block content %}{% endblock %}   
-            </main>
-        </div>
+          <!-- Page content -->
+          {% block content %}{% endblock %}
+        </main>
+      </div>
     </div>
     {% else %}
-    <!-- Unauthenticated Layout -->
-    <div class="min-h-screen bg-natural-100">
-        {% comment %} public content {% endcomment %}
-        <header class="bg-white shadow-sm">
-            <div class="container mx-auto px-4">
-                <div class="flex justify-between items-center py-4">
-                    <!-- Logo -->
-                    <div class="flex items-center">
-                        <a href="{{ url_for('index') }}" class="flex items-center">
-                            <span class="text-2xl font-bold text-primary-600">Social<span class="text-primary-500">Hub</span></span>
-                        </a>
-                    </div>
+    <!-- Content for non-authenticated users -->
+    <div class="min-h-screen bg-neutral-100">
+      <!-- Public Navigation -->
+      <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+          <div class="flex justify-between items-center py-4">
+            <!-- Logo -->
+            <div class="flex items-center">
+              <a href="{{ url_for('index') }}" class="flex items-center">
+                <span class="text-2xl font-bold text-primary-600"
+                  >VendorHub</span
+                >
+              </a>
+            </div>
 
-                    <!-- Navigation -->
-                    <nav class="hidden md:flex space-x-8">
-                        <a href="{{ url_for('marketplace.home') }}" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Marketplace</a>
-                        <a href="{{ url_for('marketplace.stores') }}" class="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200">Stores</a>
-                        <a href="{{ url_for('marketplace.search') }}" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Search</a>
-                    </nav>
+            <!-- Main Navigation -->
+            <nav class="hidden md:flex space-x-8">
+              <a
+                href="{{ url_for('marketplace.home') }}"
+                class="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                >Marketplace</a
+              >
+              <a
+                href="{{ url_for('marketplace.stores') }}"
+                class="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                >Stores</a
+              >
+              <a
+                href="{{ url_for('marketplace.search') }}"
+                class="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                >Search</a
+              >
+            </nav>
 
-                    <!-- Auth Buttons -->
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ url_for('auth.login') }}"
-                        class="text-primary-600 hover:text-primary-700 fomt-medium transition-colors duration-200">
-                            <i class="fas fa-user-circle mr-2"></i> Login
-                        </a>
-                        <a href="{{ url_for('auth.register') }}" class="bg-primary-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary-700 transition-colors duration-200">
-                        <i class="fas fa-user-plus mr-2"></i> Register
-                        </a>
-                    </div>
+            <!-- Auth Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+              <a
+                href="{{ url_for('auth.login') }}"
+                class="text-primary-600 hover:text-primary-700 font-medium"
+                >Login</a
+              >
+              <a
+                href="{{ url_for('auth.register') }}"
+                class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                >Sign Up</a
+              >
+            </div>
 
-                    <!-- Mobile Menu Button -->
-                    <button class="mobile-menu hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-                        <div class="absolute right-0 top-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300">
-                            <div class="p-5">
-                                <button class="mobile-menu-close absolute top-5 right-5 text-gray-500 hover:text-gray-700 focus:outline-none">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-
-                                <div class="mt-8 flex flex-col space-y-4">
-                                    <a href="{{ url_for('marketplace.home') }}" class="text-gray-700 hover:text-primary-600
-                                    font-medium py-2 transition-colors duration-200">Marketplace</a>
-                                    <a href="{{ url_for('marketplace.stores') }}" class="text-gray-700 hover:text-primary-600 font-medium py-4 transition-colors duration-200">Stores</a>
-                                    <a href="{{ url_for('marketplace.search') }}" class="text-gray-700 hover:text-primary-600 py-2 transition-colors duration-200">Search</a>
-                                    <div class="border-t border-gray-200 my-2"></div>
-                                    <a href="{{ url_for('auth.login') }}" class="text-primary-600 hover:text-primary-700 font-medium py-2">Login</a>
-                                    <a href="{{ url_for('auth.register') }}" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-center">sSign Up</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
-                </header>
-
-            <!--Flash messgaes -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="container mx-auto px-4 pt-6">
-                        {% for category, messages in messages %}
-                            {% set alert_class = {
-                                'success': 'bg-succes-light text-success-dark',
-                                'info': 'bg-primary-light text-priamry-dark',
-                                'warning': 'bg-secondary-light text-secondary-dark',
-                                'danger': 'bg-danger-light text-danger-dark'
-                            } %}
-                            <div class="p-4 mb-2 rounded-xl {{ alert_class.get(category, 'bg-neutral-200 text-neutral-800') }}">
-                                {{ message }}
-                            </div>
-                        {% endof %}
-                    </div>
-                {% endif %}
-            {% endwith %}
-
-            <!--page data-->
-            {% block auth_content %}{% endblock %}
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden mobile-menu-button focus:outline-none">
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
         </div>
+
+        <!-- Mobile Menu -->
+        <div
+          class="mobile-menu hidden fixed inset-0 bg-black bg-opacity-50 z-50"
+        >
+          <div
+            class="absolute right-0 top-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out overflow-y-auto"
+          >
+            <div class="p-5">
+              <button
+                class="mobile-menu-close absolute top-5 right-5 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <i class="fas fa-xmark text-xl"></i>
+              </button>
+
+              <div class="mt-8 flex flex-col space-y-4">
+                <a
+                  href="{{ url_for('marketplace.home') }}"
+                  class="text-gray-700 hover:text-primary-600 font-medium py-2 transition-colors duration-200"
+                  >Marketplace</a
+                >
+                <a
+                  href="{{ url_for('marketplace.stores') }}"
+                  class="text-gray-700 hover:text-primary-600 font-medium py-2 transition-colors duration-200"
+                  >Stores</a
+                >
+                <a
+                  href="{{ url_for('marketplace.search') }}"
+                  class="text-gray-700 hover:text-primary-600 font-medium py-2 transition-colors duration-200"
+                  >Search</a
+                >
+                <div class="border-t border-gray-200 my-2"></div>
+                <a
+                  href="{{ url_for('auth.login') }}"
+                  class="text-primary-600 hover:text-primary-700 font-medium py-2"
+                  >Login</a
+                >
+                <a
+                  href="{{ url_for('auth.register') }}"
+                  class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-center"
+                  >Sign Up</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="container mx-auto px-4 pt-6">
+        {% for category, message in messages %}
+        <div
+          class="p-4 mb-4 rounded-xl {% if category == 'error' or category == 'danger' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% elif category == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %} flex items-center animate-fadeIn"
+        >
+          <div class="mr-3 flex-shrink-0">
+            {% if category == 'error' or category == 'danger' %}
+            <i class="fas fa-circle-exclamation"></i>
+            {% elif category == 'success' %}
+            <i class="fas fa-circle-check"></i>
+            {% elif category == 'warning' %}
+            <i class="fas fa-triangle-exclamation"></i>
+            {% else %}
+            <i class="fas fa-circle-info"></i>
+            {% endif %}
+          </div>
+          <div class="flex-1">{{ message }}</div>
+          <button
+            class="ml-auto text-gray-400 hover:text-gray-500 focus:outline-none"
+            onclick="this.parentElement.remove()"
+          >
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <!-- Page content -->
+      {% block auth_content %}{% endblock %}
+    </div>
     {% endif %}
 
+    <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuButtons - document.querySelectorAll('.mobile-menu-button');
-            const mobileMenu = document.querySelectorAll('.mobile-menu');
-            const mobileMenuClose = document.querySelectorAll('.mobile-menu-close');
+      document.addEventListener("DOMContentLoaded", function () {
+        // Mobile menu functionality
+        const mobileMenuButtons = document.querySelectorAll(".mobile-menu-button");
+        const mobileMenus = document.querySelectorAll(".mobile-menu");
+        const mobileMenuCloses = document.querySelectorAll(".mobile-menu-close");
 
-            if (mobileMenuButtons.lenght > 0 && mobileMenu) {
-                mobileMenuButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        mobileMenu.classList.remove('hidden');
-                        document.body.classList.add('overflow-hidden');
-                    });
-                });
+        // Function to toggle mobile menu
+        function toggleMobileMenu(show = true) {
+          mobileMenus.forEach((menu) => {
+            if (show) {
+              menu.classList.remove("hidden");
+              document.body.classList.add("overflow-hidden");
+            } else {
+              menu.classList.add("hidden");
+              document.body.classList.remove("overflow-hidden");
             }
+          });
+        }
 
-            if (mobileMenuClose %% mobileMenu) {
-                mobileMenuClose.addEventListener('click', function() {
-                    mobileMenu.classList.add('hidden');
-                    document.body.classList.remove('overflow-hidden');
-                });
-            }
-
-            // Close mobile menu when clicking outside
-            mobileMenu?.addEventListener('click', function(e) {
-                if (e.target === mobileMenu) {
-                    mobileMenu.classList.add('hidden');
-                    document.body.classList.remove('overflow-hidden');
-                }
-            });
-
-            // add slide-in animation to mobile menu
-            if (mobileMenu) {
-                mobileMenu.addEventListener('transitionend', function(e) {
-                    if (e.propertyName === 'opacity' && mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.style.display = 'none';
-                    }
-                });
-
-                mobileMenuButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        mobileMenu.style.display = 'block';
-                        setTimeout(() => {
-                            mobileMenu.classList.remove('hidden');
-                        }, 10);
-                    });
-                });
-            }
-
-            // Mobile sidebar toggle
-            const sidebarOverlay = document.getElementById('mobileSidebar');
-            const sidebarPanel = document.getElementById('mobileSidebarPanel');
-            const openBtns = document.querySelectorAll('.mobile-menu-button');
-            const closeBtn = document.getElementById('mobileSidebarClose');
-
-            openBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    sidebarOverlay.classList.remove('hidden');
-                    setTimeout(() => {
-                        sidebarPanel.classList.remove('-translate-x-full');
-                    }, 10);
-                    document.body.classList.add('overflow-hidden');
-                });
-            });
-
-            function closeSidebar() {
-                sidebarPanel.classList.add('-translate-x-full');
-                setTimeout(() => {
-                    sidebarOverlay.classList.add('hidden');
-                    document.body.classList.remove('overflow-hidden');
-                }, 300);
-            }
-
-            closeBtn.addEventListener('click', closeSidebar);
-            sidebarOverlay.addEventListener('click', function(e) {
-                if (e.target === sidebarOverlay) closeSidebar();
-            });
-
-            // Update cart count
-            function updateCartCount() {
-                fetch('/api/cart/count')
-                    .then(response => response.json())
-                    .then(data => {
-                        const cartCountElement = document.getElementById('cart-count');
-                        if (cartCountElement) {
-                            cartCountElement.textContent = data.count;
-                            if (data.count === 0) {
-                                cartCountElement.classList.add('hidden');
-                            } else {
-                                cartCountElement.classList.remove('hidden');
-                            }
-                        }
-                    })
-                    .catch(error => console.error('Error fetching cart count:', error));
-            }
-            updateCartCount();
-            setInterval(updateCartCount, 30000);
+        // Open mobile menu
+        mobileMenuButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            toggleMobileMenu(true);
+          });
         });
+
+        // Close mobile menu
+        mobileMenuCloses.forEach((button) => {
+          button.addEventListener("click", function () {
+            toggleMobileMenu(false);
+          });
+        });
+
+        // Close mobile menu when clicking outside
+        mobileMenus.forEach((menu) => {
+          menu.addEventListener("click", function (e) {
+            if (e.target === menu) {
+              toggleMobileMenu(false);
+            }
+          });
+        });
+
+        // Fetch cart count for header
+        function updateCartCount() {
+          fetch("/api/cart/count")
+            .then((response) => response.json())
+            .then((data) => {
+              const cartCountElements = document.querySelectorAll("#cart-count, #mobile-cart-count");
+              cartCountElements.forEach((element) => {
+                if (element) {
+                  element.textContent = data.count;
+
+                  // Hide the count if it's zero
+                  if (data.count === 0) {
+                    element.classList.add("hidden");
+                  } else {
+                    element.classList.remove("hidden");
+                  }
+                }
+              });
+            })
+            .catch((error) => {
+              console.error("Error fetching cart count:", error);
+            });
+        }
+
+        // Update cart count on page load
+        updateCartCount();
+
+        // Update cart count every 30 seconds
+        setInterval(updateCartCount, 30000);
+
+        // Auto-hide flash messages after 5 seconds
+        const flashMessages = document.querySelectorAll(".animate-fadeIn");
+        if (flashMessages.length > 0) {
+          setTimeout(() => {
+            flashMessages.forEach((message) => {
+              message.style.opacity = "0";
+              message.style.transform = "translateY(-10px)";
+              message.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+              setTimeout(() => {
+                message.remove();
+              }, 300);
+            });
+          }, 5000);
+        }
+      });
     </script>
     {% block scripts %}{% endblock %}
-    
-</body>
+  </body>
 </html>

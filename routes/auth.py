@@ -1,4 +1,4 @@
-from flask import request_finished, globals, Blueprint, render_template, redirect, request, url_for, flash, session
+from flask import Blueprint, render_template, redirect, request, url_for, flash, session
 from firebase_admin import auth, credentials
 from bson.objectid import ObjectId
 from datetime import datetime
@@ -17,66 +17,43 @@ def init_db(mongo_db):
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
-        password = request.form.get('password')
-        id_token = request.form.get('id_toekn')
+        id_token = request.form.get('id_token')
 
-        if not email or not password:
-            flash('Email and password are reqiured', 'danger')
-            return render_template('auth/login.html')
+        if not id_token:
+            flash('Authentication token is required', 'danger')
+            return render_template('auth/login.html', config=firebase_config())
         
         try:
-            if id_token:
-                decoded_token = auth.verify_id_token(id_token)
-                firebase_uid = decoded_token['uid']
+            # Verify the Firebase ID token
+            decoded_token = auth.verify_id_token(id_token)
+            firebase_uid = decoded_token['uid']
 
-                db_user = db.users.find_one({'firebase_uid': firebase_uid})
+            # Check if user exists in database
+            db_user = db.users.find_one({'firebase_uid': firebase_uid})
 
-                if not db_user:
-                    flash('User not found. Please register first.', 'danger')
-                    return render_template('auth/login.html')
+            if not db_user:
+                flash('User not found. Please register first.', 'danger')
+                return render_template('auth/login.html', config=firebase_config())
 
-                session['user_id'] = str(db_user['_id'])
-                session['email'] = email
-                session['frebase_uid'] = firebase_uid
+            # Set session variables
+            session['user_id'] = str(db_user['_id'])
+            session['email'] = email or decoded_token.get('email')
+            session['firebase_uid'] = firebase_uid
 
-                db.users.update_one(
-                    {'_id': ObjectId(db_user['_id'])},
-                    {'$set': {'last_login': datetime.now()}}
-                )
+            # Update last login time
+            db.users.update_one(
+                {'_id': ObjectId(db_user['_id'])},
+                {'$set': {'last_login': datetime.now()}}
+            )
 
-                flash('Login successful!', 'success')
-                return redirect(url_for('dashboard.index'))
-            else:
-                # Fallback to direct firebase auth
-                user = auth.get_user_by_email(email)
-
-                # check if users exists in db
-                db_user = db.users.find_one({'firebase_uid': user.uid})
-
-                if not db_user:
-                    flash('User not found. Please register first.', 'danger')
-                    return render_template('auth/register.html')
-
-                # set session variable
-                session['user_id'] = str(db_user['_id'])
-                session['email'] = email
-                session['firebase_uid'] = user.uid
-
-                # last login
-                db.users.update_one(
-                    {'_id': ObjectId(db_user['_id'])},
-                    {'$set': {'last_login': datetime.now()}}
-                )
-
-                flash('Login successful!', 'success')
-                return redirect(url_for('dashboard.index'))
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard.index'))
         
         except Exception as e:
-            flash(f"login failed: {str(e)}", "danger")
+            flash(f"Login failed: {str(e)}", "danger")
             return render_template('auth/login.html', config=firebase_config())
 
     return render_template("auth/login.html", config=firebase_config())
-
 
 # Function to get Firebase config for templates
 def firebase_config():
@@ -94,49 +71,45 @@ def firebase_config():
 def register():
     if request.method == "POST":
         email = request.form.get("email")
-        password = request.form.get("password")
         phone = request.form.get("phone")
         store_name = request.form.get("store_name")
-        id_token = request.form.get("id_token") # get firebase token id here 
+        id_token = request.form.get("id_token")
 
-        if not email or not password or not phone or not store_name:
+        if not email or not phone or not store_name or not id_token:
             flash("All fields are required", "danger")
             return render_template("auth/register.html", config=firebase_config())
 
         try:
-            if id_token:
-                # veryify the token with admin sdk
-                decoded_token = auth.verify_id_token(id_token)
-                firebase_uid = decoded_token["uid"]
-            else:
-                # Create user in Firebase directly if no token provided
-                firebase_user = auth.create_user(
-                    email=email,
-                    password=password,
-                    phone_number=phone
-                )
-                firebase_uid = firebase_user.uid
+            # Verify the Firebase ID token
+            decoded_token = auth.verify_id_token(id_token)
+            firebase_uid = decoded_token["uid"]
+            
+            # Check if user already exists
+            existing_user = db.users.find_one({'firebase_uid': firebase_uid})
+            if existing_user:
+                flash("User already exists. Please login instead.", "warning")
+                return redirect(url_for("auth.login"))
 
-            # Slug for store name
+            # Create slug for store name
             slug = re.sub(r'[^\w\s-]', '', store_name.lower())
             slug = re.sub(r'[\s_-]+', '-', slug)
 
-            # checking for existing stor 
+            # Check for existing store with same slug
             existing_slug = db.users.find_one({'store.slug': slug})
             if existing_slug:
-                # Add a random suffix to make it not clash with other store slugs 
+                # Add a random suffix to make it unique
                 import uuid
                 slug = f"{slug}-{str(uuid.uuid4())[:8]}"
 
-            # create new uer
+            # Create new user
             user_id = db.users.insert_one({
-                'firebase': firebase_uid,
+                'firebase_uid': firebase_uid,
                 'email': email,
                 "phone": phone,
                 "store": {
                     "name": store_name,
                     "slug": slug,
-                    "whatsapp": phone, # Default to register Phone so no panic
+                    "whatsapp": phone,  # Default to registered phone
                     "description": ""
                 },
                 "created_at": datetime.now(),
@@ -156,11 +129,7 @@ def register():
             flash(f"Registration failed: {str(e)}", "danger")
             return render_template("auth/register.html", config=firebase_config())
 
-    try:
-        return render_template("auth/register.html", config=firebase_config())
-    except Exception as e:
-        print(" Error rendering register.html:", str(e))
-        return "Something went wrong", 500
+    return render_template("auth/register.html", config=firebase_config())
 
 @auth_bp.route('/logout')
 def logout():

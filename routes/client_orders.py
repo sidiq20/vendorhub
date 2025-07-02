@@ -54,7 +54,7 @@ def checkout():
             cart_items.append({
                 'product': product,
                 'store': store['store'] if store else {},
-                'qauntity': item['quantity'],
+                'quantity': item['quantity'],
                 'item_total': item_total
             })
             
@@ -91,7 +91,7 @@ def checkout():
             
             stores[store_id]['items'].append({
                 'product_id': str(item['product']['_id']),
-                'quantity': item['qauntity'],
+                'quantity': item['quantity'],
                 'item_total': item['item_total'],
                 'price': item['product']['price'],
                 'name': item['product']['name'],

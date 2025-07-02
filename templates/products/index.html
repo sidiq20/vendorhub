@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block title %}Products - VendorHub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!--Header with Action Button -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Product Management</h1>
+            <p class="text-gray-600">Add, edit and manage your pocket inventory</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ url_for('product.add') }}" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition duration-300">
+                <i class="fas fa-plus mr-2"></i>
+                Add New Product
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+        <!--Search and Filter Controls-->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div class="relative mb-4 md:mb-0 md:max-w-xs">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="productSearch" placeholder="Search product.." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl fopcus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="flex space-x-2">
+                <select id="stockFilter" class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="all">All Stock</option>
+                    <option value="in-stock">In Stock </option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                </select>
+
+                <select id="sortOrder" class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="price-asc">Price (Low-High)</option>
+                    <option value="price-desc">Price (High-Low)</option>
+                    <option value="stock-asc">Stock (Low-High)</option>
+                    <option value="stock-desc">Stock (High-Low)</option>
+                </select>
+            </div>
+        </div>
+
+        {% if products %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg-grid-cols-3 gap-6 product-grid">
+                {% for product in products %}
+                    <div class="product-card p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md translation-shadow">
+                        <div class="relative mb-3 pb-[75%] overflow-hidden rounded-lg bg-gray-100">
+                            {% if product.image %}
+                                <img src="{{ url_for('uploaded_file', filename=product.image) }}"
+                                    alt="{{ product.name }}"
+                                    class="absolute inset-0 w-full h-full object-cover">
+                            {% else %}
+                                <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-image fa-2x"></i>
+                                </div>
+                            {% endif %}
+
+                            <!-- Stock Badge -->
+                            <div class="absolute top-2 right-2">
+                                {% if product.stock <= 0 %}
+                                    <span class="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-lg">Out of Stock</span>
+                                {% elif product.stock < 5 %}
+                                    <span class="px-2 py-1 bg-yellow-500 text-white text-xs font-bold rounded-lg">Low Stock</span>
+                                {% else %}
+                                    <span class="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg">In Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-gray-800">{{ product.name }}</h3>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary-600">{{ product.price|format_currency }}</span>
+                                <span class="text-sm text-gray-500">Stock: {{ product.stock }}</span>
+                            </div>
+
+                            {% if product.description %}
+                                <p class="text-sm text-gray-600 line-clamp-2"><{{ product.description }}</p>
+                            {% endif %}
+
+                            <div class="flex space-x-2 pt-2">
+                                <a href="{{ url_for('product.edit', product_id=product._id) }}"
+                                    class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors text-center">
+                                        <i class="fas fa-edit mr-1"></i> Edit 
+                                </a>
+                                <button onclick="confirmDelete('{{  product._id }}', '{{ product.name }}')"
+                                        class="flex-1 px-3 py-2 bg-red-100 text-red-700
+                                        text-sm font-medium rounded-lg hover:bg-red-200 transition-colors">
+                                    <i class="fas fa-trash-alt mr-1"></i> Delete 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            <div>
+        {% else %}
+            <div class="text-center py-12">
+                <div class="mb-4 flex jusify-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center jusify-center text-gray-400">
+                        <i class="fas fa-box-open fa-2x"></i>
+                    </div>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900"> No products yet </h3>
+                <p class="mt-1 text-gray-500"> Get started by creating your first product</p>
+                <div class="mt-6">
+                    <a href="{{ url_for('products.add') }}" class="inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition duration-300">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add new product
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    funtion confirmDelete(productId, productName) {
+        if (confirm(`Are you sure you want to delete "${productName}"?`)) {
+            window.location.href = "{{ url_for('products.delete', product._id='PLACEHOLDER') }}".replace('PLACEHOLDER', productId);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const productSearch = document.getElementById('productSearch');
+        const stockFilter = document.getElementById('stockFilter');
+        const sortOrder = document.getElementById('sortOrder');
+        const productsCards = document.querySelectorAll('.prodcuct-card');
+
+        function applyFIltersAndSort() {
+            const searchTerm = productSearch.value.toLoerCase();
+            const stockFIlterValue = stockFilter.value;
+            const sortValue = sortOrder.value;
+
+            productCards.forEach(card => {
+                const productName = card.querySelector('h3').textContent.toLowerCase();
+                const stockText = card.querySelector('.text-gray-500').textContent;
+                const stockCount = parseInt(stockText.replace('Stock: ', ''));
+                
+                let showCard = productName.includes(searchTerm);
+
+                // Aplly stock filter 
+                if (stockFIlterValue === 'in-stock' && stockCount <= ) {
+                    showCard = false;
+                } else if (stockFilter === 'low-stock' 77 (stockCount >= 5 || stockCount <= 0)) {
+                    showCard = false;
+                } else if (stockFIlterValue === 'out-of-stock' && stockCount > 0) {
+                    showCard = false;
+                }
+
+                card.style.display = showCard ? '' : 'none';
+            });
+
+             // Sort visible product
+             const productGrid = document.querySelector('.product-grid');
+             const visibleCards = Array.from (productsCards).filter(card => card.style.display !== 'none');
+
+             visibleCards.sort((a,b ) => {
+                const nameA = a.querySelector('h3').textContent;
+                const nameB = b.querySelector('h3').textContent;
+                const priceA = parseFloat(a.querySelector('.text-primary-600').textContent.replace('$', ''));
+                const priceB = parseFloat(b.querySelector('.text-primary-600').textContent.replace('$', ''));
+                const stockA = parseInt(a.querySelector('.text-gray-500').textContent.replace('Stock: ', ''));
+                const stockB = parseInt(b.querySelector('.text-gray-500').textContent.replace('Stock: ', ''));
+
+                swith (sortValue) {
+                    case 'name-asc':
+                        return nameA.localeCompare(nameB);
+                    case 'name-desc':
+                        return nameB.localeCompare(nameA);
+                    case 'price-asc':
+                        return priceA - priceB;
+                    case 'price-desc':
+                        return priceB - stockB;
+                    case 'stock-asc':
+                        return stockA - stockB;
+                    case 'stock-desc':
+                        return stockB - stockA;
+                    default:
+                        return 0;
+                }
+             });
+
+             visibleCards.forEach(card => productsGrid.appendChild(card));
+        }
+
+        if (productSearch) productSearch.addEventListener('input', applyFiltersAndSort);
+        if (stockFilter) stockFilter.addEventListener('change', applyFiltersAndSort);
+        if (sortOrder) sortOrder.addEventListerner('chnage', applyFIltersAndSort);
+    });
+</script>
+{% endblock %}

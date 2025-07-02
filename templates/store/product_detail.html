@@ -1,0 +1,403 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ product.name }} - {{ user.store.name }}{% endblock %}
+
+{% block head %}
+<!-- Additional styles for product page -->
+<style>
+    .image-zoom {
+        transition: transform 0.5s ease;
+    }
+    .image-zoom:hover {
+        transform: scale(1.05);
+    }
+    
+    .quantity-input::-webkit-inner-spin-button,
+    .quantity-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .quantity-input {
+        -moz-appearance: textfield;
+    }
+    
+    .rating-stars input {
+        display: none;
+    }
+    
+    .rating-stars label {
+        cursor: pointer;
+    }
+    
+    .review-card {
+        transition: all 0.3s ease;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex items-center space-x-2 text-sm">
+                <a href="{{ url_for('marketplace.home') }}" class="text-gray-500 hover:text-primary-600 transition-colors duration-200">Home</a>
+                <span class="text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </span>
+                <a href="{{ url_for('store.catalog', slug=user.store.slug) }}" class="text-gray-500 hover:text-primary-600 transition-colors duration-200">{{ user.store.name }}</a>
+                <span class="text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </span>
+                <span class="text-gray-800 font-medium truncate">{{ product.name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                <!-- Product Image -->
+                <div class="relative h-full">
+                    <div class="aspect-w-1 aspect-h-1 w-full h-full overflow-hidden">
+                        {% if product.image %}
+                        <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}" class="h-full w-full object-cover object-center image-zoom">
+                        {% else %}
+                        <div class="h-full w-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+                            <svg class="h-24 w-24 text-primary-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <h1 class="text-3xl font-bold text-neutral-800 mb-2">{{ product.name }}</h1>
+                        <p class="text-3xl font-bold text-primary-600">${{ product.price }}</p>
+                    
+                    <!-- Product Rating -->
+                    <div class="mt-2 flex items-center">
+                        <div class="flex items-center">
+                            {% set avg_rating = product.avg_rating|default(0) %}
+                            {% for i in range(1, 6) %}
+                                {% if i <= avg_rating|round(0, 'floor') %}
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                {% elif i <= avg_rating + 0.5 %}
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                {% else %}
+                                    <svg class="h-5 w-5 text-neutral-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="ml-2 text-sm text-neutral-600">
+                            {% if product.review_count|default(0) > 0 %}
+                                <a href="{{ url_for('reviews.product_reviews', product_id=product._id) }}" class="text-primary hover:underline">
+                                    {{ product.review_count }} review{% if product.review_count != 1 %}s{% endif %}
+                                </a>
+                            {% else %}
+                                <a href="#review-form" class="text-primary hover:underline">Write a review</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Stock Status -->
+                    <div class="mt-4 mb-6">
+                        {% if product.stock > 10 %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                <svg class="mr-1.5 h-2 w-2 text-green-500" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                In Stock
+                            </span>
+                        {% elif product.stock > 0 %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                <svg class="mr-1.5 h-2 w-2 text-yellow-500" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Low Stock ({{ product.stock }} left)
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <svg class="mr-1.5 h-2 w-2 text-red-500" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Out of Stock
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Product Description -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Description</h3>
+                        <div class="prose prose-sm text-gray-600">
+                            {% if product.description %}
+                                <p>{{ product.description }}</p>
+                            {% else %}
+                                <p>No description available for this product.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Add to Cart Form -->
+                    <form action="{{ url_for('cart.add_to_cart') }}" method="POST" class="space-y-6">
+                        <input type="hidden" name="product_id" value="{{ product._id }}">
+                        
+                        <div class="flex items-center space-x-4">
+                            <label for="quantity" class="text-sm font-medium text-gray-700">Quantity:</label>
+                            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                                <button type="button" class="quantity-btn minus px-3 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors duration-200" {% if product.stock <= 0 %}disabled{% endif %}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                    </svg>
+                                </button>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" class="w-14 text-center border-0 focus:ring-0 focus:outline-none text-gray-800 font-medium quantity-input" {% if product.stock <= 0 %}disabled{% endif %}>
+                                <button type="button" class="quantity-btn plus px-3 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors duration-200" {% if product.stock <= 0 %}disabled{% endif %}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                            <button type="submit" class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center" {% if product.stock <= 0 %}disabled{% endif %}>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Add to Cart
+                            </button>
+                            <a href="{{ url_for('cart.view_cart') }}" class="flex-1 bg-white border border-primary-600 text-primary-600 hover:bg-primary-50 font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                View Cart
+                            </a>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Product Reviews Section -->
+        <div class="mt-12 neu-card">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-neutral-800">Customer Reviews</h2>
+                <a href="{{ url_for('reviews.product_reviews', product_id=product._id) }}" class="text-primary hover:underline text-sm font-medium">See all reviews</a>
+            </div>
+            
+            {% set reviews = reviews|default([]) %}
+            {% if reviews %}
+                <div class="space-y-6">
+                    {% for review in reviews[:3] %}
+                        <div class="p-4 bg-neutral-50 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center mb-1">
+                                        {% for i in range(1, 6) %}
+                                            {% if i <= review.rating %}
+                                                <svg class="h-4 w-4 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            {% else %}
+                                                <svg class="h-4 w-4 text-neutral-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    {% if review.title %}
+                                        <h3 class="text-sm font-semibold text-neutral-800">{{ review.title }}</h3>
+                                    {% endif %}
+                                </div>
+                                
+                                <span class="text-xs text-neutral-500">{{ review.created_at|format_date }}</span>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <p class="text-sm text-neutral-600">{{ review.comment }}</p>
+                            </div>
+                            
+                            <div class="mt-2 text-xs text-neutral-500">By {{ review.reviewer.name }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-neutral-600 mb-4">No reviews yet. Be the first to review this product!</p>
+                </div>
+            {% endif %}
+            
+            <!-- Write a Review Form -->
+            <div id="review-form" class="mt-8 pt-6 border-t border-neutral-200">
+                <h3 class="text-lg font-semibold text-neutral-800 mb-4">Write a Review</h3>
+                
+                <form action="{{ url_for('reviews.add_review', product_id=product._id) }}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-neutral-700 mb-1">Rating</label>
+                        <div class="flex items-center">
+                            <div class="rating flex space-x-1">
+                                {% for i in range(1, 6) %}
+                                    <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="hidden" {% if i == 5 %}checked{% endif %}>
+                                    <label for="star{{ i }}" class="cursor-pointer">
+                                        <svg class="h-6 w-6 text-neutral-300 hover:text-yellow-400 star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-neutral-700 mb-1">Your Name</label>
+                            <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-neutral-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-neutral-700 mb-1">Email (optional)</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-neutral-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-neutral-700 mb-1">Review Title</label>
+                        <input type="text" id="title" name="title" class="w-full px-4 py-2 border border-neutral-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div>
+                        <label for="comment" class="block text-sm font-medium text-neutral-700 mb-1">Your Review</label>
+                        <textarea id="comment" name="comment" rows="4" required class="w-full px-4 py-2 border border-neutral-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="neu-button px-6 py-2">
+                            Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-soft mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm text-neutral-600">&copy; {{ user.store.name }} {{ now.year }}</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <p class="text-sm text-neutral-500">Powered by <span class="font-medium text-primary">SocialHub</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript for quantity buttons and star rating -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quantity buttons
+            const minusBtn = document.querySelector('.quantity-btn.minus');
+            const plusBtn = document.querySelector('.quantity-btn.plus');
+            const quantityInput = document.querySelector('#quantity');
+            const maxStock = {{ product.stock }};
+            
+            if (minusBtn && plusBtn && quantityInput) {
+                minusBtn.addEventListener('click', function() {
+                    const currentValue = parseInt(quantityInput.value);
+                    if (currentValue > 1) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+                
+                plusBtn.addEventListener('click', function() {
+                    const currentValue = parseInt(quantityInput.value);
+                    if (currentValue < maxStock) {
+                        quantityInput.value = currentValue + 1;
+                    }
+                });
+            }
+            
+            // Star rating
+            const starLabels = document.querySelectorAll('.rating label');
+            const starInputs = document.querySelectorAll('.rating input');
+            
+            starLabels.forEach((label, index) => {
+                label.addEventListener('mouseover', function() {
+                    // Fill in this star and all stars before it
+                    for (let i = 0; i <= index; i++) {
+                        starLabels[i].querySelector('svg').classList.add('text-yellow-400');
+                        starLabels[i].querySelector('svg').classList.remove('text-neutral-300');
+                    }
+                    // Clear all stars after it
+                    for (let i = index + 1; i < starLabels.length; i++) {
+                        starLabels[i].querySelector('svg').classList.remove('text-yellow-400');
+                        starLabels[i].querySelector('svg').classList.add('text-neutral-300');
+                    }
+                });
+                
+                label.addEventListener('click', function() {
+                    starInputs[index].checked = true;
+                });
+            });
+            
+            // Reset stars when mouse leaves the rating container
+            const ratingContainer = document.querySelector('.rating');
+            ratingContainer.addEventListener('mouseleave', function() {
+                // Find the selected rating
+                let selectedIndex = -1;
+                starInputs.forEach((input, index) => {
+                    if (input.checked) {
+                        selectedIndex = index;
+                    }
+                });
+                
+                // Update stars based on selection
+                starLabels.forEach((label, index) => {
+                    if (index <= selectedIndex) {
+                        label.querySelector('svg').classList.add('text-yellow-400');
+                        label.querySelector('svg').classList.remove('text-neutral-300');
+                    } else {
+                        label.querySelector('svg').classList.remove('text-yellow-400');
+                        label.querySelector('svg').classList.add('text-neutral-300');
+                    }
+                });
+            });
+            
+            // Initialize stars based on default selection
+            let selectedIndex = 4; // Default to 5 stars
+            starInputs.forEach((input, index) => {
+                if (input.checked) {
+                    selectedIndex = index;
+                }
+            });
+            
+            starLabels.forEach((label, index) => {
+                if (index <= selectedIndex) {
+                    label.querySelector('svg').classList.add('text-yellow-400');
+                    label.querySelector('svg').classList.remove('text-neutral-300');
+                }
+            });
+        });
+    </script>
+{% endblock %}

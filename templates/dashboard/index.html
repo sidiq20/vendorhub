@@ -1,0 +1,269 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - VendorHub{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800"> Dashboard</h1>
+            <p class="text-gray-600">Welcome back, {{ user.store.name }}!</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <span class="text-sm font-semibold text-gray-700">Your STore URL:</span>
+            <a href="{{ url_for('store.catalog', slug=user.store.slug) }}" target="_blank" class="ml-2 text-primary-600 hover:text-primary-800 font-medium">
+                {{ request.host_url }}store/{{ user.store.slug }}
+                <i class="fas fa-external-link-alt ml-1 text-x3"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+        <!--Total Sales -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">Total Sales</h2>
+                    <h3 class="text-2xl font-bold text-green-600 mt-1" id="totalSales">{{ total_sales|format_currency }}</h3>
+                </div>
+                <div class="text-green-500 p-3 rounded-full bg-green-100">
+                    <i class="fas fa-dollar-sign fa-2x"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Products</p>
+                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                    id="totalProducts">{{ products_count }}</h3>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-box text-blue-500"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('products.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    Manage Products <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Customers -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Customers</p>
+                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                    id="totalCustomers">{{ customers_count }}</h3>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-users text-purple-500"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('customers.index') }}" class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                    Manage Customers <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+
+            <!-- Orders -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Orders</p>
+                    <h3 class="text-2xl font-bold text-gray-800 mt-1"
+                    id="totalOrders">{{ orders_count }}</h3>
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-shopping-cart text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('orders.index') }}" class="text-sm text-yellow-600 hover:text-yellow-800 font-medium">
+                    Manage Orders <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders and low stock -->
+    <div class="grid grid-cols-1 lg:grid-cols-2  gap-8">
+        <!--recent orders -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800"> Recent Orders</h3>
+                <a href="{{ url_for('orders.index') }}" class="text-sm text-primary-600 hover:text-primary-800 font-medium">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            {% if recent_orders %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-4 py-3 text-left text-sx font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-900">{{ order.customer_name }}</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="text-sm text-gray-600">{{ order.created_at|format_datetime }}</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="text-sm font-gray-900">
+                                    {{ order.total|format_currency }}</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    {% if order.status == 'pending' %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% elif order.status == 'fulfilled' or order.status == 'completed' %}
+                                        bg-green-100 text-green-800 
+                                    {% elif order.status == 'cancelled' %}
+                                        bg-red-100 text-red-800
+                                    {% else %}
+                                        bg-gray-100 text-gray-800
+                                    {% endif %}
+                                ">
+                                    {{ order.status|capitalize }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="py-8 text-center">
+                <div class="mb-4 text-gray-400">
+                    <i class="fas fa-shopping-cart text-4xl"></i>
+                </div>
+                <p class="text-gray-600">No recent orders found.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- low stock product -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800"> Low stock Products</h3>
+                <a href="{{ url_for('products.index') }}" class="text-sm text-primary-600 hover:text-primary-800 font-medium">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            {% if low_stock_products %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium
+                            text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for products in low_stock_products %}
+                        <tr>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    {% if product.image %}
+                                    <img src="{{ url_for('uploaded_file', filename=product.image) }}" alt="{{ product.name }}" class="w-10 h-10 rounded-full mr-3">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-md bg-gray-200 flex items-center jusfity-center">
+                                        <i class="fas fa-box text-gray-400"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                        {{ products.name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="text-sm font-gray-900">{{ products.price|format_currency }}</span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold round-full bg-red-100 text-red-800">{{ products.stock }} left </span>
+                            </td>
+                            <td class="px-4 px-3 whitespace-nowrap text-sm font-medium">
+                                <a href="{{ url_for('products.edit', id=product.id) }}" class="text-primary-600 hover:text-primary-900">
+                                    Update Stock
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="py-8 text-center">
+                <div class="mb-4 text-green-400">
+                    <i class="fas fa-check-circle text-4xl"></i>
+                </div>
+                <p class="text-gray-600">All products are well stocked.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        if (!obj) return;
+
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+            if (id === 'totalSales') {
+                const value = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = '$' + value.toFixed(2);
+            } else {
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+            }
+
+            if (progress <script 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const totalSalesElement = document.getElementById('totalSales');
+        const totalProductsElement = document.getElementById('totalProducts');
+        const totalCustomersElement = document.getElementById('totalCustomers');
+        const totalOrdersElement = document.getElementById('totalOrders')
+
+        let totalSales = totalSalesElement ? parseFloat(totalSalesElement.textContent.replace('$', '').replace(',', '')) : 0;
+        let totalProducts = totalProductsElement ? parseInt(totalProductsElement.textContent) : 0;
+        let totalCustomers = totalCustomersElement ? parseInt(totalCustomersElement.textContent) : 0;
+        let totalOrders = totalOrdersElement ? parseInt(totalOrdersElement.textContent) : 0;
+
+        animateValue('totalSales', 0, total_sales, 1500);
+        animateValue('totalProducts', 0, total_products, 1500);
+        animateValue('totalCustomers', 0, total_customers, 1500);
+        animateValue('totalOrders', 0, totalOrders, 1000);
+    });
+</script>
+{% endblock %}
