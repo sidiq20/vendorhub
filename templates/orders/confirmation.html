@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block title %}order confirmation - VendorHub Marketplace{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-soft p-8 text-center mb-8">
+        <div class="w-16 h-16 bg-success-light rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="h-8 w-8 text-success" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-neutral-800 mb-2">Thank You for Your Order!</h1>
+        <p class="text-neutral-600 mb-6">Your order has been placed successfully.</p>
+        
+        <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+            <a href="{{ url_for('client_orders.order_history') }}" class="px-6 py-3 border border-neutral-300 rounded-xl shadow-sm text-sm font-medium text-neutral-700 bg-white hover:bg-neutral-50 text-center">
+                View Order History
+            </a>
+            <a href="{{ url_for('marketplace.home') }}" class="neu-button text-center hover-glow px-6 py-3">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+    
+    {% for orders in orders %}
+        <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-neutral-800">Order #{{ orders.order_id[:8] }}</h2>
+                    <p class="text-sm text-neutral-600">Placed on {{ orders.created_at.|format_datetime }}</p>
+                </div>
+                <div class="mt-2 sm:mt-0">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-light text-primary-dark">
+                        {{ order.status|title }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-200 pt-4"></div>
+                <h3 class="text-sm font-medium text-natural-700 mb-2">Items from {{ order.store_name }}</h3>
+
+                <div class="space-y-3">
+                    {% for item in order.items %}
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-neutral-800"> {{ items.name }} </p>
+                                <p class="text-xs text-neutral-500">Quantity: {{ item.quantity }}</p>
+                            </div>
+                            <p class="text-sm font-medium text-neutral-800">
+                                ${{ item.item_total }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-neutral-200 flex justify-between">
+                    <span class="text-base font-medium text-neutral-700">Total:</span>
+                    <span class="text-lg font-bold text-neutral-900">
+                        ${{ order.total }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                <a href="{{ url_for('client_orders.order_detail', order_id=order.order_id) }}" class="px-6 py-2 border border-neutral-300 rounded-xl shadow-sm text-sm font-medium text-neutral-700 bg-white hover:bg-neutral-50 text-center">
+                    View Order Details
+                </a>
+                <a href="{{ url_for('client_orders.track_order', order_id=order.order_id) }}" class="px-6 py-2 border border-primary rounded-xl shadow-sm text-sm font-medium text-primary bg-white hover:bg-primary-light text-center">
+                    Track Order
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

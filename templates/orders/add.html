@@ -1,0 +1,344 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Order - VendorHub{% endblock %}
+{% block header %}Add Order{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex items-center mb-6">
+        <a href="{{ url_for('orders.index') }}" class="text-primary-600 hover:text-primary-800 mr-3">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-800">Add New Order</h1>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Customer Information -->
+        <div class="lg:col-span-1">
+            <div class="card-neu bg-white p-6 rounded-2xl">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Customer Information</h2>
+                
+                <div class="mb-6">
+                    <div class="mb-4">
+                        <select id="customer_id" name="customer_id" class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="">Select existing customer</option>
+                            {% for customer in customers %}
+                                <option value="{{ customer._id }}" data-name="{{ customer.name }}" data-phone="{{ customer.phone }}">
+                                    {{ customer.name }} - {{ customer.phone }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="text-center my-4">
+                        <span class="text-sm text-gray-500">or add new customer</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                        <input 
+                            type="text" 
+                            id="customer_name" 
+                            name="customer_name" 
+                            class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            placeholder="Enter customer name"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            id="customer_phone" 
+                            name="customer_phone"
+                            class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            placeholder="Phone number with country code"
+                        >
+                    </div>
+                </div>
+            
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Order Notes</label>
+                    <textarea 
+                        id="notes" 
+                        name="notes" 
+                        rows="3" 
+                        class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="Add any notes about this order (optional)"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Items -->
+        <div class="lg:col-span-2">
+            <div class="card-neu bg-white p-6 rounded-2xl">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Order Items</h2>
+                
+                <div class="bg-gray-50 p-4 rounded-xl mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <label for="product_select" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                            <select id="product_select" class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">Select a product</option>
+                                {% for product in products %}
+                                    {% if product.stock > 0 %}
+                                        <option value="{{ product._id }}" data-price="{{ product.price }}" data-name="{{ product.name }}" data-stock="{{ product.stock }}">
+                                            {{ product.name }} ({{ product.price|format_currency }}) - {{ product.stock }} in stock
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-1">
+                            <label for="quantity_input" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                            <input 
+                                type="number" 
+                                id="quantity_input" 
+                                class="input-neu w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                min="1" 
+                                value="1"
+                            >
+                        </div>
+                        
+                        <div class="md:col-span-1 flex items-end">
+                            <button id="add_item_btn" type="button" class="btn-neu w-full px-4 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors">
+                                <i class="fas fa-plus mr-1"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-md font-medium text-gray-700 mb-3">Items in this order</h3>
+                    <div id="orderItemsContainer" class="border rounded-xl overflow-hidden">
+                        <div class="text-gray-500 text-center py-4">
+                            No items yet. Add products to this order.
+                        </div>
+                    </div>
+                </div>
+            
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-lg font-bold text-gray-800">Total:</span>
+                    <span id="orderTotal" class="text-xl font-bold text-primary-600">$0.00</span>
+                </div>
+                
+                <form method="POST" action="{{ url_for('orders.add') }}" id="orderForm">
+                    <input type="hidden" id="customer_id_hidden" name="customer_id">
+                    <input type="hidden" id="customer_name_hidden" name="customer_name">
+                    <input type="hidden" id="customer_phone_hidden" name="customer_phone">
+                    <input type="hidden" id="notes_hidden" name="notes">
+                    <input type="hidden" id="order_items_json" name="order_items_json">
+                    
+                    <div class="flex justify-end space-x-4">
+                        <a href="{{ url_for('orders.index') }}" class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </a>
+                        <button type="submit" id="saveOrderButton" class="btn-neu px-8 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors hover-glow">
+                            <i class="fas fa-save mr-2"></i>
+                            Save Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Customer selection
+        const customerSelect = document.getElementById('customer_id');
+        const customerNameInput = document.getElementById('customer_name');
+        const customerPhoneInput = document.getElementById('customer_phone');
+        
+        // Hidden form values
+        const customerIdHidden = document.getElementById('customer_id_hidden');
+        const customerNameHidden = document.getElementById('customer_name_hidden');
+        const customerPhoneHidden = document.getElementById('customer_phone_hidden');
+        const notesHidden = document.getElementById('notes_hidden');
+        const orderItemsJson = document.getElementById('order_items_json');
+        
+        // Product selection
+        const productSelect = document.getElementById('product_select');
+        const quantityInput = document.getElementById('quantity_input');
+        const addItemButton = document.getElementById('add_item_btn');
+        const orderItemsContainer = document.getElementById('orderItemsContainer');
+        const orderTotalElement = document.getElementById('orderTotal');
+        
+        // Notes
+        const notesTextarea = document.getElementById('notes');
+        
+        // Order items array to store the items
+        let orderItems = [];
+        let orderTotal = 0;
+        
+        // Update hidden fields before form submission
+        const saveOrderButton = document.getElementById('saveOrderButton');
+        if (saveOrderButton) {
+            saveOrderButton.addEventListener('click', function(e) {
+                // Set customer values
+                customerIdHidden.value = customerSelect.value;
+                customerNameHidden.value = customerNameInput.value;
+                customerPhoneHidden.value = customerPhoneInput.value;
+                notesHidden.value = notesTextarea.value;
+                orderItemsJson.value = JSON.stringify(orderItems);
+                
+                // Validate form
+                if (orderItems.length === 0) {
+                    e.preventDefault();
+                    alert('Please add at least one item to the order.');
+                    return false;
+                }
+                
+                if (!customerIdHidden.value && (!customerNameHidden.value || !customerPhoneHidden.value)) {
+                    e.preventDefault();
+                    alert('Please select an existing customer or enter customer details.');
+                    return false;
+                }
+            });
+        }
+        
+        // Populate customer fields when selecting from dropdown
+        if (customerSelect) {
+            customerSelect.addEventListener('change', function() {
+                if (this.value) {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const customerName = selectedOption.getAttribute('data-name');
+                    const customerPhone = selectedOption.getAttribute('data-phone');
+                    
+                    customerNameInput.value = customerName;
+                    customerPhoneInput.value = customerPhone;
+                    
+                    // Clear fields if "Select existing customer" is chosen
+                } else {
+                    customerNameInput.value = '';
+                    customerPhoneInput.value = '';
+                }
+            });
+        }
+        
+        // When typing in customer fields, clear the dropdown selection
+        [customerNameInput, customerPhoneInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', function() {
+                    customerSelect.value = '';
+                });
+            }
+        });
+        
+        // Add item to order
+        if (addItemButton) {
+            addItemButton.addEventListener('click', function() {
+                if (!productSelect.value) {
+                    alert('Please select a product');
+                    return;
+                }
+                
+                const quantity = parseInt(quantityInput.value) || 0;
+                if (quantity <= 0) {
+                    alert('Please enter a valid quantity');
+                    return;
+                }
+                
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const productId = productSelect.value;
+                const productName = selectedOption.getAttribute('data-name');
+                const price = parseFloat(selectedOption.getAttribute('data-price'));
+                const stock = parseInt(selectedOption.getAttribute('data-stock'));
+                
+                if (quantity > stock) {
+                    alert(`Only ${stock} items available in stock`);
+                    return;
+                }
+                
+                // Add to order items array
+                const item = {
+                    id: productId,
+                    name: productName,
+                    price: price,
+                    quantity: quantity,
+                    total: price * quantity
+                };
+                
+                orderItems.push(item);
+                updateOrderItemsDisplay();
+                updateOrderTotal();
+                
+                // Reset inputs
+                productSelect.value = '';
+                quantityInput.value = '1';
+            });
+        }
+        
+        // Update order items display
+        function updateOrderItemsDisplay() {
+            if (orderItems.length === 0) {
+                orderItemsContainer.innerHTML = `
+                    <div class="text-gray-500 text-center py-4">
+                        No items yet. Add products to this order.
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-2 px-4 text-left text-sm font-medium text-gray-700">Product</th>
+                            <th class="py-2 px-4 text-center text-sm font-medium text-gray-700">Qty</th>
+                            <th class="py-2 px-4 text-right text-sm font-medium text-gray-700">Price</th>
+                            <th class="py-2 px-4 text-right text-sm font-medium text-gray-700">Total</th>
+                            <th class="py-2 px-4 text-center text-sm font-medium text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            orderItems.forEach((item, index) => {
+                html += `
+                    <tr class="border-t">
+                        <td class="py-2 px-4 text-sm text-gray-800">${item.name}</td>
+                        <td class="py-2 px-4 text-center text-sm text-gray-800">${item.quantity}</td>
+                        <td class="py-2 px-4 text-right text-sm text-gray-800">$${item.price.toFixed(2)}</td>
+                        <td class="py-2 px-4 text-right text-sm font-medium text-gray-800">$${item.total.toFixed(2)}</td>
+                        <td class="py-2 px-4 text-center">
+                            <button type="button" class="text-danger-600 hover:text-danger-800" onclick="removeItem(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            orderItemsContainer.innerHTML = html;
+        }
+        
+        // Update order total
+        function updateOrderTotal() {
+            orderTotal = orderItems.reduce((sum, item) => sum + item.total, 0);
+            orderTotalElement.textContent = '$' + orderTotal.toFixed(2);
+        }
+        
+        // Remove item from order
+        window.removeItem = function(index) {
+            orderItems.splice(index, 1);
+            updateOrderItemsDisplay();
+            updateOrderTotal();
+        };
+        
+        // Initialize the order items display
+        updateOrderItemsDisplay();
+    });
+</script>
+{% endblock %}
