@@ -1,8 +1,6 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
-{% block title %}
-    Order Details - VendorHub
-{% endblock %}
+{% block title %}Order Details - SocialHub{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
@@ -12,32 +10,33 @@
             <p class="text-sm text-neutral-600">Placed on {{ order.created_at|format_datetime }}</p>
         </div>
         <div class="mt-2 md:mt-0">
-            {% set status_class {
+            {% set status_class = {
                 'pending': 'bg-neutral-200 text-neutral-800',
                 'processing': 'bg-primary-light text-primary-dark',
                 'shipped': 'bg-secondary-light text-secondary-dark',
                 'delivered': 'bg-success-light text-success-dark',
                 'cancelled': 'bg-danger-light text-danger-dark'
             } %}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ status_class.get(order.status, 'bg-neutral-300 text-neutral-800') }}">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ status_class.get(order.status, 'bg-neutral-200 text-neutral-800') }}">
                 {{ order.status|title }}
             </span>
         </div>
     </div>
-
+    
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Order Details -->
         <div class="md:col-span-2">
             <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
                 <h2 class="text-lg font-semibold text-neutral-800 mb-4">Items from {{ order.store_name }}</h2>
-
+                
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
                             <tr class="border-b border-neutral-200">
-                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Product</th>
-                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Price</th>
-                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Quantity</th>
-                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Total</th>
+                                <th class="py-3 px-2 text-left text-sm font-medium text-neutral-500">Product</th>
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-500">Price</th>
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-500">Quantity</th>
+                                <th class="py-3 px-2 text-right text-sm font-medium text-neutral-500">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,26 +45,107 @@
                                     <td class="py-4 px-2">
                                         <p class="text-sm font-medium text-neutral-800">{{ item.name }}</p>
                                     </td>
-                                    <td class="py-4 px-2 text-center text-sm text-neutral-800">N{{ item.price }}</td>
-                                    <td class="py-4 px-2 text-center text-sm text-neutral-800">{{ item.quantity }}</td>
-                                    <td class="py-4 px-2 text-center text-sm text-neutral-800 font-medium">N{{ item.item_total }}</td>
+                                    <td class="py-4 px-2 text-center text-sm text-neutral-700">${{ item.price }}</td>
+                                    <td class="py-4 px-2 text-center text-sm text-neutral-700">{{ item.quantity }}</td>
+                                    <td class="py-4 px-2 text-right text-sm font-medium text-neutral-800">${{ item.item_total }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-
+                
                 <div class="mt-6 border-t border-neutral-200 pt-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-base font-medium text-neutral-700"> Subtotal</span>
-                        <span class="text-base text-neutral-800">N{{ order.total }}</span>
+                        <span class="text-base font-medium text-neutral-700">Subtotal</span>
+                        <span class="text-base text-neutral-800">${{ order.total }}</span>
                     </div>
                     <div class="flex justify-between items-center mt-2">
-                        <span class="text-sm font-medium text-neutral-700">Shipping</span>
+                        <span class="text-sm text-neutral-600">Shipping</span>
                         <span class="text-sm text-neutral-800">Free</span>
                     </div>
                     <div class="flex justify-between items-center mt-4 pt-4 border-t border-neutral-200">
-                        <span class="text-base font-semibold text-neutral-800">Total</span>
-                        <span class="text-base text-neutral-800">N{{ order.total }}</span>
+                        <span class="text-base font-bold text-neutral-800">Total</span>
+                        <span class="text-xl font-bold text-primary">${{ order.total }}</span>
+                    </div>
+                </div>
+            </div>
             
+            <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+                <h2 class="text-lg font-semibold text-neutral-800 mb-4">Order Status</h2>
+                
+                <div class="space-y-4">
+                    {% for status_entry in order.status_history %}
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-primary-light rounded-full flex items-center justify-center">
+                                    <svg class="h-4 w-4 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-neutral-800">{{ status_entry.status|title }}</p>
+                                <p class="text-xs text-neutral-600">{{ status_entry.timestamp|format_datetime }}</p>
+                                {% if status_entry.note %}
+                                    <p class="text-sm text-neutral-700 mt-1">{{ status_entry.note }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="md:col-span-1">
+            <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+                <h2 class="text-lg font-semibold text-neutral-800 mb-4">Shipping Information</h2>
+                
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm font-medium text-neutral-700">{{ order.customer.name }}</p>
+                        <p class="text-sm text-neutral-600">{{ order.customer.email }}</p>
+                        <p class="text-sm text-neutral-600">{{ order.customer.phone }}</p>
+                    </div>
+                    
+                    <div class="pt-3 border-t border-neutral-200">
+                        <p class="text-sm text-neutral-600">{{ order.customer.address }}</p>
+                        <p class="text-sm text-neutral-600">{{ order.customer.city }}, {{ order.customer.state }} {{ order.customer.zip_code }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+                <h2 class="text-lg font-semibold text-neutral-800 mb-4">Store Information</h2>
+                
+                <div class="space-y-3">
+                    <p class="text-sm font-medium text-neutral-700">{{ order.store_name }}</p>
+                    
+                    {% if store %}
+                        <div class="pt-3 border-t border-neutral-200">
+                            <a href="{{ url_for('store.catalog', slug=store.slug) }}" class="text-primary hover:underline text-sm font-medium">Visit Store</a>
+                        </div>
+                        
+                        {% if store.whatsapp %}
+                            <div class="pt-3 border-t border-neutral-200">
+                                <a href="https://wa.me/{{ store.whatsapp|replace('+', '') }}" target="_blank" class="text-primary hover:underline text-sm font-medium flex items-center">
+                                    <svg class="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                    </svg>
+                                    Contact via WhatsApp
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-soft p-6">
+                <h2 class="text-lg font-semibold text-neutral-800 mb-4">Need Help?</h2>
+                <p class="text-sm text-neutral-600 mb-4">If you have any questions about your order, please contact our support team.</p>
+                <a href="#" class="text-primary hover:underline text-sm font-medium">Contact Support</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
