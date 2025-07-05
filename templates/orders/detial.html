@@ -8,5 +8,64 @@
 <div class="container mx-auto px-4 py-8">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-neutral-800"
+            <h1 class="text-2xl font-bold text-neutral-800">Order #{{ order.order_id[:8] }}</h1>
+            <p class="text-sm text-neutral-600">Placed on {{ order.created_at|format_datetime }}</p>
+        </div>
+        <div class="mt-2 md:mt-0">
+            {% set status_class {
+                'pending': 'bg-neutral-200 text-neutral-800',
+                'processing': 'bg-primary-light text-primary-dark',
+                'shipped': 'bg-secondary-light text-secondary-dark',
+                'delivered': 'bg-success-light text-success-dark',
+                'cancelled': 'bg-danger-light text-danger-dark'
+            } %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ status_class.get(order.status, 'bg-neutral-300 text-neutral-800') }}">
+                {{ order.status|title }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+                <h2 class="text-lg font-semibold text-neutral-800 mb-4">Items from {{ order.store_name }}</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-neutral-200">
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Product</th>
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Price</th>
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Quantity</th>
+                                <th class="py-3 px-2 text-center text-sm font-medium text-neutral-600">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                                <tr class="border-b border-neutral-200">
+                                    <td class="py-4 px-2">
+                                        <p class="text-sm font-medium text-neutral-800">{{ item.name }}</p>
+                                    </td>
+                                    <td class="py-4 px-2 text-center text-sm text-neutral-800">N{{ item.price }}</td>
+                                    <td class="py-4 px-2 text-center text-sm text-neutral-800">{{ item.quantity }}</td>
+                                    <td class="py-4 px-2 text-center text-sm text-neutral-800 font-medium">N{{ item.item_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 border-t border-neutral-200 pt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-medium text-neutral-700"> Subtotal</span>
+                        <span class="text-base text-neutral-800">N{{ order.total }}</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-sm font-medium text-neutral-700">Shipping</span>
+                        <span class="text-sm text-neutral-800">Free</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-neutral-200">
+                        <span class="text-base font-semibold text-neutral-800">Total</span>
+                        <span class="text-base text-neutral-800">N{{ order.total }}</span>
+            
 {% endblock %}
