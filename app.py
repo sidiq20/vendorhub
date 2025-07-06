@@ -2,7 +2,7 @@ import os
 import logging
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, flash, session, send_from_directory, request
-from pymongo import response, server, mongo_client, MongoClient
+from pymongo import response, mongo_client, MongoClient
 import firebase_admin
 from firebase_admin import credentials
 from werkzeug.utils import secure_filename

@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}Order - VendorHub{% endblock %}
+
+{% block header %}
+    Orders
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!--Header with Action Button -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Order Management</h1>
+            <p class="text-gray-600">Track and manage your customer orders</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="{{ url_for('orders.add') }}" class="btn-neu inline-flex items-center px-6 py-3 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition duration-300 hover-glow">
+                <i class="fas fa-plus mr-2"></i>
+                Add New Order
+            </a>
+        </div>
+    </div>
+
+    <!-- Orders Table/List -->
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+        <!-- Search and Filter Controls-->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div class="relative mb-4 md:mb-0 md:max-w-xs">
+                <span class="absolute inset-y-0 left-0 flex-center pl-3 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="orderSearch" placeholder="Search orders..." class="input-neu w-full pl-10 pr-4 py-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+            </div>
+
+            <div class="flex space-x-2">
+                <select id="statusFilter" class="input-neu px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="fulfilled">Fulfilled</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            
+                <select id="sortOrder" class="input-neu px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="date-dec">Latest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="total-desc">Amout (High-Low)</option>
+                    <option value="total-asc">Amount (Low-High)</option>
+                </select>
+            </div>
+        </div>
+        {% if orders %}
+            <!-- Desktop View (Table)-->
+            <div class="hidden md:block">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-whider">Order Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-whider">Customer</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-whider">Total</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-whider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-whider">Actions</th>
+                        </tr>
+                    <thead>
+                    <tbody class="divide-y divde-gray-200">
+                        {% for order in orders %}
+                            <tr class="order-row" data-status="{{ order.status }}" data-date="{{ order.created_at|format_date_iso }}" data-total="{{ order.total }}" data-customer="{{ order.customer_name }}">
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ order.created_at|format_dat }}</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div>
+                                            <div class="text-sm items-center">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ order.customer_name }}</div>
+                                                    <div class="text-sm text-gray-500">{{ order.customer_name }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">{{ order.total|format_currency }}</div>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            {% if order.status == 'pending' %}
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                                                    Pending
+                                                </span>
+                                            {% elif order.status == 'fulfilled' %}
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Fulfilled
+                                                </span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    Cancelled
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-4 py-4 text-right text-sm">
+                                            <a href="{{ url_for('orders.view', order_id=order) }}" class="text-primary-600 hover:text-primary-800 font-medium">
+                                                View Details 
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mobile View (Cards) -->
+                    <div class="md:hidden space-y-4">
+                        {% for order in orders %}
+                            <div class="order-card bg-gray-50 p-4 rounded-xl" data-status="{{ order.status }}" data-date="{{ order.created_at|format_date_iso }}" data-total="{{ order.total }}" data-customer="{{ order.customer_name }}">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class=""
