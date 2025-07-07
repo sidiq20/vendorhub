@@ -113,4 +113,12 @@
                             <div class="order-card bg-gray-50 p-4 rounded-xl" data-status="{{ order.status }}" data-date="{{ order.created_at|format_date_iso }}" data-total="{{ order.total }}" data-customer="{{ order.customer_name }}">
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <h3 class=""
+                                        <h3 class="font-medium text-gray-900">{{ order.customer_name }}</h3>
+                                        <p class="text-sm text-gray-500">{{ order.customer_name }}</p>
+                                    </div>
+                                    {% if order.status == 'pending' %}
+                                        <span class="px-2 py-1 text-sm font-semibold rounded-full bg-amber-100 text-amber-800">Pending</span>
+                                    {% elfi order.status == 'fulfilled' %}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Fulfilled</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class=""

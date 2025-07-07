@@ -2,11 +2,13 @@ import os
 import logging
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, url_for, flash, session, send_from_directory, request
-from pymongo import response, mongo_client, MongoClient
+from pymongo import MongoClient
 import firebase_admin
 from firebase_admin import credentials
 from werkzeug.utils import secure_filename
 import uuid
+import json 
+from io import StringIO
 from dotenv import load_dotenv
 
 from routes.auth import auth_bp
@@ -26,9 +28,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-# initalize app 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
+app.secret_key = os.environ.get("SESSION_SECRET")
 app.permanent_session_lifetime = timedelta(days=7)
 
 # configure
@@ -40,14 +41,13 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload size
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
-# Create uploads directory if it doesnt exist
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 # Initalize Firebase Admin SDK
 try:
-    # First try using enviroment varibale
-    if os.environ.get("FIREBASE_SERVICE_ACCOUNT"):
-        cred = credentials.Certificate(os.environ.get('FIREBASE_SERVICE_ACCOUNT'))
+    service_account_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+    if service_account_json:
+        cred = credentials.Certificate(json.load(StringIO(service_account_json)))
         firebase_admin.initialize_app(cred)
         logger.info("firebase initailzed with service account from evvironemt variable")
     # Fall back to file-based config
@@ -73,10 +73,8 @@ except Exception as e:
 # MongoDB Connection
 try:
     mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-    # Set a specific database name instead of trying to extract it from the URI
     db_name = 'vendorapp'
     db = mongo_client[db_name]
-    # Ping the server to check if it's available
     mongo_client.admin.command('ping')
     logger.info(f"Connected to MongoDB successfully ({db_name})")
 except Exception as e:
@@ -85,17 +83,7 @@ except Exception as e:
     raise
 
 # initailze routes with databse connection
-from routes import auth
-from routes import cart
-from routes import dashboard
-from routes import marketplace
-from routes import products
-from routes import store
-from routes import customers
-from routes import client_orders
-from routes import reviews
-from routes import settings
-from routes import orders
+from routes import auth, cart , dashboard, marketplace, products, store, customers, client_orders, reviews, settings, orders
 
 
 auth.init_db(db)
@@ -129,7 +117,6 @@ def log_request_info(response):
     logger.info(f"Request: {request.method} {request.path} => Status: {response.status_code}")
     return response
 
-# Hleper function for temp
 @app.template_filter("format_currency")
 def format_currency(amount):
     return f"${amount:.2f}" if amount else "$0.00"

@@ -3,6 +3,9 @@ from itertools import product
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
+from dataclasses import dataclass, field
+import uuid
+from typing import Optional, List
 
 
 class User:
