@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash, session
-from firebase_admin import auth, credentials
 from bson.objectid import ObjectId
+from services.auth_services import find_or_create_user, login_user
+from utils.firebase import firebase_config, verify_firebase_token
 from datetime import datetime
-import re
-import os
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -25,11 +24,9 @@ def login():
         
         try:
             # Verify the Firebase ID token
-            decoded_token = auth.verify_id_token(id_token)
+            decoded_token = verify_firebase_token(id_token)
             firebase_uid = decoded_token['uid']
-
-            # Check if user exists in database
-            db_user = db.users.find_one({'firebase_uid': firebase_uid})
+            db_user = login_user(db, firebase_uid)
 
             if not db_user:
                 flash('User not found. Please register first.', 'danger')
@@ -55,17 +52,6 @@ def login():
 
     return render_template("auth/login.html", config=firebase_config())
 
-# Function to get Firebase config for templates
-def firebase_config():
-    return {
-        'FIREBASE_API_KEY': os.environ.get('FIREBASE_API_KEY'),
-        'FIREBASE_AUTH_DOMAIN': os.environ.get('FIREBASE_AUTH_DOMAIN'),
-        'FIREBASE_PROJECT_ID': os.environ.get('FIREBASE_PROJECT_ID'),
-        'FIREBASE_STORAGE_BUCKET': os.environ.get('FIREBASE_STORAGE_BUCKET'),
-        'FIREBASE_MESSAGING_SENDER_ID': os.environ.get('FIREBASE_MESSAGING_SENDER_ID'),
-        'FIREBASE_APP_ID': os.environ.get('FIREBASE_APP_ID'),
-        'FIREBASE_MEASUREMENT_ID': os.environ.get('FIREBASE_MEASUREMENT_ID')
-    }
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -80,42 +66,15 @@ def register():
             return render_template("auth/register.html", config=firebase_config())
 
         try:
-            # Verify the Firebase ID token
-            decoded_token = auth.verify_id_token(id_token)
+            decoded_token = verify_firebase_token(id_token)
             firebase_uid = decoded_token["uid"]
             
-            # Check if user already exists
             existing_user = db.users.find_one({'firebase_uid': firebase_uid})
             if existing_user:
                 flash("User already exists. Please login instead.", "warning")
                 return redirect(url_for("auth.login"))
 
-            # Create slug for store name
-            slug = re.sub(r'[^\w\s-]', '', store_name.lower())
-            slug = re.sub(r'[\s_-]+', '-', slug)
-
-            # Check for existing store with same slug
-            existing_slug = db.users.find_one({'store.slug': slug})
-            if existing_slug:
-                # Add a random suffix to make it unique
-                import uuid
-                slug = f"{slug}-{str(uuid.uuid4())[:8]}"
-
-            # Create new user
-            user_id = db.users.insert_one({
-                'firebase_uid': firebase_uid,
-                'email': email,
-                "phone": phone,
-                "store": {
-                    "name": store_name,
-                    "slug": slug,
-                    "whatsapp": phone,  # Default to registered phone
-                    "description": ""
-                },
-                "created_at": datetime.now(),
-                "updated_at": datetime.now(),
-                "last_login": datetime.now()
-            }).inserted_id
+            user_id = find_or_create_user(db, firebase_uid, email, phone, store_name)
 
             # Set session variables
             session['user_id'] = str(user_id)
