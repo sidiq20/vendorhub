@@ -2,15 +2,14 @@ from datetime import datetime
 import uuid
 from typing import Optional
 
-class Product:
-    def __init__(self, user_id, name = None, price = None, stock=0, description: Optional[str] = None, image = None):
+class Customer:
+    def __init__(self, user_id, name, phone, notes: Optional[str] = None, order_count=0):
         self.id = str(uuid.uuid4())
         self.user_id = user_id
-        self.name = name
-        self.price = price
-        self.stock = stock
-        self.description = description
-        self.image = image
+        self.name = name 
+        self.phone = phone 
+        self.notes = notes
+        self.order_count = order_count
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
         
@@ -19,10 +18,9 @@ class Product:
             'id': self.id,
             'user_id': self.user_id,
             'name': self.name,
-            'price': self.price,
-            'stock': self.stock,
-            'description': self.description,
-            'image': self.image,
+            'phone': self.phone,
+            'notes': self.notes,
+            'order_count': self.order_count,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

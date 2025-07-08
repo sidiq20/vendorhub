@@ -14,6 +14,8 @@ class User:
         self.phone = phone
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
+        
+        # Store relationship
         self.store_name = store_name
         self.store_slug = store_slug
         self.store_whatsapp = store_whatsapp
