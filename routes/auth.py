@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from services.auth_services import find_or_create_user, login_user
 from utils.firebase import firebase_config, verify_firebase_token
 from datetime import datetime
+from services.cart_service import merge_guest_cart_to_user_cart
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -36,6 +37,8 @@ def login():
             session['user_id'] = str(db_user['_id'])
             session['email'] = email or decoded_token.get('email')
             session['firebase_uid'] = firebase_uid
+            
+            merge_guest_cart_to_user_cart(db, session)
 
             # Update last login time
             db.users.update_one(
@@ -80,6 +83,7 @@ def register():
             session['user_id'] = str(user_id)
             session['email'] = email
             session['firebase_uid'] = firebase_uid
+            merge_guest_cart_to_user_cart(db, session)
 
             flash('Registration successful!', "success")
             return redirect(url_for("dashboard.index"))
