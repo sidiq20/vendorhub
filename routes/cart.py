@@ -1,79 +1,23 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session, request, jsonify
 from bson.objectid import ObjectId
-from datetime import datetime
-import uuid
+from datetime import datetime, timezone
+from services.cart_service import get_or_create_cart, calculate_cart_items
 
 #create bp
 cart_bp = Blueprint("cart", __name__)
 
-# mongo will be passed from the main
 db = None
 
 def init_db(mongo_db):
     global db
     db = mongo_db
 
-# Helper funtions to crate or pick up cart 
-def get_or_create_cart():
-    cart_id = session.get("card_id")
-    
-    # if no cart create new one 
-    if not cart_id:
-        cart_id = str(uuid())
-        session["cart_id"] = cart_id
-        db.carts.insert_one({
-            "cart_id": cart_id,
-            "user_id": session.get("user_id"),
-            "items": [],
-            "created_at": datetime.now(),
-            "updated_at": datetime.now()
-        })
-        
-    # get cart from db
-    cart = db.carts.find_one({"cart_id": cart_id})
-    
-    # if cart doesnt exist in database (might have been cleared), create a new one 
-    if not cart:
-        db.carts.insert_one({
-            "cart_id": cart_id,
-            "user_id": session.get("user_id"),
-            "items": [],
-            "created_at": datetime.now(),
-            "updated_at": datetime.now()
-        })
-        cart = db.carts.find_one({"cart_id": cart_id})
-        
-    return cart
 
 @cart_bp.route("/cart")
 def view_cart():
-    """View cart conetnts"""
-    cart = get_or_create_cart()
+    cart = get_or_create_cart(db, session)
+    cart_items, total = calculate_cart_items(db, cart)
     
-    # get product details for each items in cart
-    cart_items = []
-    total = 0
-    
-    for item in cart.get('items', []):
-        product = db.products.find_one({"_id": ObjectId(item["product_id"])})
-        if product:
-            store = db.users.find_one(
-                {"_id": ObjectId(product["user_id"])},
-                {"store.name": 1, "store.slug": 1}
-            )
-            
-            
-            # calculate item total
-            item_total = product["price"] * item["quantity"]
-            total += item_total
-            
-            cart_items.append({
-                "product": product,
-                "store": store["store"] if store else {},
-                "quantity": item["quantity"],
-                "item_total": item_total
-            })
-            
     return render_template(
         "cart/view_cart.html",
         cart_items=cart_items,
@@ -100,11 +44,9 @@ def add_to_cart():
         flash(f"Sorry, only {product["stock"]} items available", "warning")
         return redirect(request.referrer or url_for("marketplace.home"))
     
-    # Get or create cart
-    cart = get_or_create_cart()
+    cart = get_or_create_cart(db, session)
     
     # check is product is in cart
-    items_exists = False
     for item in cart.get("items", []):
         if item["product_id"] == product_id:
             # Update quantity
@@ -114,21 +56,18 @@ def add_to_cart():
                 return redirect(request.referrer or url_for("marketplace.home"))
             
             db.carts.update_one(
-                {"cart_id": cart["cart_id"], "items.product_id":
-                    product_id},
-                {"$set": {"items.$.quantity": new_quantity}}
+                {"cart_id": cart["cart_id"], "items.product_id": product_id},
+                {"$set": {"items.$.quantity": new_quantity, "updated_at": datetime.now(timezone.utc)}}
             )
-            items_exists = True
+
             break
-    
-    # if product is not in cart, add it 
-    if not items_exists:
+    else:
         db.carts.update_one(
             {"cart_id": cart["cart_id"]},
             {
                 "$push": {"items": {"product_id": product_id,
                 "quantity": quantity}},
-                "$set": {"updated_at": datetime.now()}
+                "$set": {"updated_at": datetime.now(timezone.utc)}
             }
         )
         
@@ -145,7 +84,6 @@ def update_cart():
         flash("Product not fount", "damger")
         return redirect(url_for("cart.view_cart"))
     
-    # check if product exist and is in stock
     product = db.products.find_one({"_id": ObjectId(product_id)})
     if not product:
         flash("Product not found", "danger")
@@ -157,7 +95,7 @@ def update_cart():
             {"cart_id": session.get("cart_id")},
             {
                 "$pull": {"items": {"product_id": product_id}},
-                "$set": {"updated_at": datetime.now()}
+                "$set": {"updated_at": datetime.now(timezone.utc)}
             }
         )
         flash("item removed from cart", "ifo")
@@ -167,11 +105,9 @@ def update_cart():
             flash(f"Sorry, only {product["stock"]} items available", "warning")
             quantity = product["stock"]
             
-        
-        # Update quantity
         db.carts.upate_one(
             {"cart_id": session.get("cart_id"), "items.product_id": product_id},
-            {"$set": {"items.$.quantity": quantity, "updated_at": datetime.now()}}
+            {"$set": {"items.$.quantity": quantity, "updated_at": datetime.now(timezone.utc)}}
         )
         flash("Cart updated", "success")
         
@@ -189,7 +125,7 @@ def remove_from_cart(product_id):
         {"cart_id": session.get("cart_id")},
         {
             "$pull": {"items": {"product_id": product_id}},
-            "$set": {"updated_at": datetime.now()}
+            "$set": {"updated_at": datetime.now(timezone.utc)}
         }
     )
     flash("Item removed from cart", "info")
@@ -197,7 +133,6 @@ def remove_from_cart(product_id):
 
 @cart_bp.route("/cart/clear")
 def clear_cart():
-    """Clear all items from cart"""
     db.carts.update_one(
         {"cart_id": session.get("cart_id")},
         {
@@ -211,10 +146,8 @@ def clear_cart():
     flash("Cart cleared", "info")
     return redirect(url_for("cart.view_cart"))
 
-# API endpoint to get cart count for header
 @cart_bp.route("/api/cart.count")
 def cart_count():
-    """Get number of items in cart"""
-    cart = get_or_create_cart()
+    cart = get_or_create_cart(db, session)
     count = sum(item["quantity"] for item in cart.get("items", []))
     return jsonify({"count": count})

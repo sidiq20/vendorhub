@@ -1,37 +1,46 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 import uuid
 
+CART_EXPIRY_DAYS = 7
 
 def generate_cart_id():
     return str(uuid.uuid4())
 
+def is_cart_expired(cart):
+   return cart.get("expires_at") and cart["expires_at"] < datetime.now(timezone.utc)
+
 def get_or_create_cart(db, session):
-    cart_id = session.get("cart_id")
+    user_id = session.get("user_id")
+    cart = None
     
-    if not cart_id:
-        cart_id = generate_cart_id()
-        session["cart_id"] = cart_id
-        db.carts.insert_one({
-            "cart_id": cart_id,
-            "user_id": session,
-            "items": [],
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
-        })
+    if user_id:
+        cart = db.carts.find_one({"user_id": ObjectId(user_id)})
+    else:
+        cart_id = session.get("cart_id")
+        if cart_id:
+            cart = db.carts.find_one({"cart_id": cart_id})
+            
+    if cart and is_cart_expired(cart):
+        db.carts.delete_one({"_id": cart["_id"]})
+        cart = None
         
-    cart = db.carts.find_one({"cart_id": cart_id})
     if not cart:
-        db.carts.insert_one({
-            "carts_id": cart_id,
-            "user_id": session.get("user_id"),
+        new_cart = {
+            "cart_id": generate_cart_id(),
+            "user_id": ObjectId(user_id) if user_id else None,
             "items": [],
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
-        })
-        cart = db.carts.find_one({"cart_id": cart_id})
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+            "expires_at": datetime.now(timezone.utc) + timedelta(days=CART_EXPIRY_DAYS)
+        }
+        db.insert_one(new_cart)
+        cart = new_cart
+        if not user_id:
+            session["cart_id"] = new_cart["cart_id"]
     
     return cart
+    
 
 def calculate_cart_items(db, cart):
     cart_items = []

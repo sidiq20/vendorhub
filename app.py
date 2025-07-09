@@ -10,6 +10,7 @@ import uuid
 import json 
 from io import StringIO
 from dotenv import load_dotenv
+from flasgger import Swagger
 
 from routes.auth import auth_bp
 from routes.cart import cart_bp
@@ -29,6 +30,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+Swagger(app)
 app.secret_key = os.environ.get("SESSION_SECRET")
 app.permanent_session_lifetime = timedelta(days=7)
 
