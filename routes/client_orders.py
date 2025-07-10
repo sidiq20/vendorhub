@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session, request, jsonify
 from bson.objectid import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from utils.validators import validate_checkout_form
 from services.order_service import build_cart_items, create_orders_from_cart
@@ -39,8 +39,30 @@ def checkout():
     if request.method == "POST":
         missing = validate_checkout_form(request.form)
         if missing:
-            flash(f"Missing fields: {', '.join(missing)}")
+            flash(f"Missing fields: {', '.join(missing)}", "warning")
+            return render_template("orders/checkout.html", cart_items=cart_items, total=total, now=datetime.now())
+        
+        customer_info = {
+            "name": request.form["name"],
+            "email": request.form["email"],
+            "phone": request.form["phone"],
+            "address": request.form["address"],
+            "city": request.form["city"],
+            "state": request.form["state"],
+            "zip_code": request.form["zip_code"]
+        }
+        
+        order_ids = create_orders_from_cart(db, session, cart_items, customer_info)
+        
+        db.carts.update_one(
+            {"cart_id": cart_id},
+            {"$set": {"items": [], "updated_at": datetime.now()}}
+        )
     
+        session["recent_orders"] = order_ids
+        return redirect(url_for("client_order.confirmation"))
+
+    return render_template("orders/checkout.html", cart_items=cart_items, total=total, now=datetime.now(timezone.utc))
     
 @client_orders_bp.route("/orders/confirmation")
 def confirmation():

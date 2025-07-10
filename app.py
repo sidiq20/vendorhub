@@ -11,6 +11,19 @@ import json
 from io import StringIO
 from dotenv import load_dotenv
 from flasgger import Swagger
+from flask_socketio import SocketIO
+
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+Swagger(app)
+app.secret_key = os.environ.get("SESSION_SECRET")
+app.permanent_session_lifetime = timedelta(days=7)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 from routes.auth import auth_bp
 from routes.cart import cart_bp
@@ -24,15 +37,6 @@ from routes.reviews import reviews_bp
 from routes.settings import settings_bp
 from routes.orders import orders_bp
 
-load_dotenv()
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s %(message)s")
-logger = logging.getLogger(__name__)
-
-app = Flask(__name__)
-Swagger(app)
-app.secret_key = os.environ.get("SESSION_SECRET")
-app.permanent_session_lifetime = timedelta(days=7)
 
 # configure
 MONGO_URI = os.environ.get('MONGO_URI')
@@ -157,4 +161,4 @@ def server_error(e):
     return render_template('500.html'), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    socketio.run(host="0.0.0.0", port=5000, debug=True)

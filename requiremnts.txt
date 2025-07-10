@@ -1,8 +1,31 @@
-Flask==2.2.3
-firebase-admin==6.1.0
-pymongo==4.3.3
+# Core Flask dependencies
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+Werkzeug==2.3.7
+
+# Database
+pymongo==4.5.0
+
+# Authentication
+firebase-admin==6.2.0
+
+# Image processing and cloud storage
+cloudinary==1.36.0
+Pillow==10.0.1
+
+# Validation
+marshmallow==3.20.1
+
+# API documentation
+flasgger==0.9.7.1
+
+# Environment management
 python-dotenv==1.0.0
-Werkzeug==2.2.3
-dnspython==2.3.0
-Pillow==9.5.0
-gunicorn==20.1.0
+
+# Utilities
+python-slugify==8.0.1
+
+# Rate limiting and caching
+Flask-Limiter==3.5.0
+redis==5.0.1
+Flask-Caching==2.1.0
